@@ -214,6 +214,60 @@ def render_config_section():
     return script_length, custom_length, num_scripts
 
 
+def render_ai_section(model_options: dict):
+    """Hiển thị phần chọn model và API key."""
+    _render_section_header(
+        "🤖",
+        "Cấu hình AI",
+        "Chọn model sử dụng và nhập API key nếu bạn không muốn dùng biến môi trường.",
+        "AI",
+    )
+
+    model_labels = list(model_options.keys())
+    default_label = st.session_state.get("selected_model_label", model_labels[0])
+    if default_label not in model_labels:
+        default_label = model_labels[0]
+
+    col_model, col_key = st.columns([1.1, 1.4])
+
+    with col_model:
+        selected_label = st.selectbox(
+            "Model",
+            options=model_labels,
+            index=model_labels.index(default_label),
+        )
+
+    with col_key:
+        manual_api_key = st.text_input(
+            "API key",
+            type="password",
+            value=st.session_state.get("manual_api_key", ""),
+            placeholder="Để trống nếu muốn dùng API key từ biến môi trường",
+            help="Hệ thống sẽ ưu tiên key nhập tại đây. Nếu để trống, app sẽ tự đọc biến môi trường tương ứng với model.",
+        )
+
+    st.session_state.selected_model_label = selected_label
+    st.session_state.manual_api_key = manual_api_key
+    return selected_label, model_options[selected_label], manual_api_key
+
+
+def render_ai_status(selected_label: str, selected_model: str, api_key_source: str, has_api_key: bool):
+    """Hiển thị trạng thái model và API key đang dùng."""
+    key_status = "Đã sẵn sàng" if has_api_key else "Chưa có API key"
+    key_source_label = "nhập trực tiếp" if api_key_source == "manual" else f"biến môi trường {api_key_source}"
+    status_class = "success-box" if has_api_key else "warning-box"
+
+    st.markdown(
+        f"""
+        <div class="{status_class} status-box">
+            <strong>Model đang chọn:</strong> {selected_label} ({selected_model})<br>
+            <strong>API key:</strong> {key_status} - nguồn: {key_source_label}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def render_progress_bar(progress_value, status_text):
     """Giữ lại để tương thích, hiện không dùng loading riêng."""
     st.info(f"{status_text} ({progress_value}%)")
