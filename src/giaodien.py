@@ -21,15 +21,45 @@ def load_custom_css():
     st.markdown(
         """
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
+
+            :root {
+                --bg: #f5f7fb;
+                --surface: #ffffff;
+                --surface-soft: #f8fafc;
+                --line: #dbe4f0;
+                --text: #0f172a;
+                --muted: #5b6b84;
+                --brand-1: #0f766e;
+                --brand-2: #2563eb;
+                --brand-3: #0ea5e9;
+                --success-bg: #effaf3;
+                --success-border: #a7e0b8;
+                --success-text: #166534;
+                --warning-bg: #fff8e8;
+                --warning-border: #f7d18a;
+                --warning-text: #b45309;
+                --error-bg: #fff1f2;
+                --error-border: #f7b2bb;
+                --error-text: #be123c;
+                --info-bg: #eef5ff;
+                --info-border: #b7d3ff;
+                --info-text: #1d4ed8;
+                --shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+            }
 
             html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
-                background: #ffffff !important;
-                color: #0f172a !important;
+                background:
+                    radial-gradient(circle at top left, rgba(14, 165, 233, 0.10), transparent 32%),
+                    radial-gradient(circle at top right, rgba(37, 99, 235, 0.12), transparent 28%),
+                    var(--bg) !important;
+                color: var(--text) !important;
+                font-family: 'Be Vietnam Pro', sans-serif !important;
             }
 
             [data-testid="stHeader"] {
-                background: #ffffff !important;
+                background: rgba(245, 247, 251, 0.85) !important;
+                backdrop-filter: blur(10px);
             }
 
             [data-testid="stToolbar"] {
@@ -37,114 +67,220 @@ def load_custom_css():
             }
 
             [data-testid="stMainBlockContainer"] {
-                background: #ffffff !important;
+                max-width: 1180px;
+                padding-top: 2rem;
+                padding-bottom: 3rem;
             }
 
             .main {
-                font-family: 'Inter', sans-serif;
-                padding: 1rem;
-                background: #ffffff;
+                font-family: 'Be Vietnam Pro', sans-serif;
             }
 
-            .main-header {
-                background: linear-gradient(135deg, #0f766e 0%, #1d4ed8 100%);
-                padding: 2rem;
-                border-radius: 15px;
-                text-align: center;
-                color: white;
-                margin-bottom: 2rem;
-                box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
-            }
-
-            .main-header h1 {
-                font-size: 2.5rem;
-                font-weight: 700;
-                margin: 0;
-            }
-
-            .main-header p {
-                margin: 0.75rem 0 0;
-                font-size: 1rem;
-                opacity: 0.9;
-            }
-
-            .card {
-                background: #ffffff;
-                padding: 1.5rem;
-                border-radius: 12px;
-                box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
-                border: 1px solid #e2e8f0;
+            .hero-shell {
+                position: relative;
+                overflow: hidden;
+                padding: 2.2rem 2.4rem;
+                border-radius: 28px;
+                background:
+                    linear-gradient(135deg, rgba(15, 118, 110, 0.98) 0%, rgba(37, 99, 235, 0.98) 100%);
+                color: #ffffff;
+                box-shadow: var(--shadow);
                 margin-bottom: 1.5rem;
             }
 
-            .card-header {
+            .hero-shell::before {
+                content: "";
+                position: absolute;
+                inset: auto -60px -80px auto;
+                width: 260px;
+                height: 260px;
+                border-radius: 999px;
+                background: rgba(255, 255, 255, 0.08);
+            }
+
+            .hero-shell::after {
+                content: "";
+                position: absolute;
+                inset: -70px auto auto -70px;
+                width: 200px;
+                height: 200px;
+                border-radius: 999px;
+                background: rgba(255, 255, 255, 0.10);
+            }
+
+            .hero-eyebrow {
+                position: relative;
+                z-index: 1;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.45rem;
+                font-size: 0.82rem;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                padding: 0.5rem 0.85rem;
+                border: 1px solid rgba(255, 255, 255, 0.22);
+                border-radius: 999px;
+                background: rgba(255, 255, 255, 0.08);
+            }
+
+            .hero-title {
+                position: relative;
+                z-index: 1;
+                margin: 1rem 0 0.65rem;
+                font-size: 2.35rem;
+                line-height: 1.15;
+                font-weight: 800;
+                letter-spacing: -0.03em;
+            }
+
+            .hero-copy {
+                position: relative;
+                z-index: 1;
+                max-width: 720px;
+                margin: 0;
+                font-size: 1rem;
+                line-height: 1.7;
+                color: rgba(255, 255, 255, 0.92);
+            }
+
+            .hero-grid {
+                position: relative;
+                z-index: 1;
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 0.9rem;
+                margin-top: 1.4rem;
+            }
+
+            .hero-stat {
+                padding: 1rem 1.05rem;
+                border-radius: 18px;
+                background: rgba(255, 255, 255, 0.10);
+                border: 1px solid rgba(255, 255, 255, 0.14);
+            }
+
+            .hero-stat span {
+                display: block;
+                color: rgba(255, 255, 255, 0.72) !important;
+                font-size: 0.82rem;
+                margin-bottom: 0.28rem;
+            }
+
+            .hero-stat strong {
+                font-size: 1rem;
+                color: #ffffff;
+                font-weight: 700;
+            }
+
+            .section-card {
+                background: rgba(255, 255, 255, 0.92);
+                border: 1px solid rgba(219, 228, 240, 0.92);
+                border-radius: 24px;
+                padding: 1.35rem 1.35rem 1.15rem;
+                box-shadow: 0 14px 36px rgba(15, 23, 42, 0.05);
+                margin-bottom: 1.15rem;
+                backdrop-filter: blur(8px);
+            }
+
+            .section-head {
                 display: flex;
                 align-items: center;
-                margin-bottom: 1rem;
-                padding-bottom: 0.5rem;
-                border-bottom: 2px solid #e2e8f0;
+                justify-content: space-between;
+                gap: 1rem;
+                margin-bottom: 0.95rem;
             }
 
-            .card-icon {
-                font-size: 1.5rem;
-                margin-right: 0.5rem;
+            .section-title-wrap {
+                display: flex;
+                align-items: center;
+                gap: 0.8rem;
             }
 
-            .card-title {
-                font-size: 1.2rem;
-                font-weight: 600;
-                color: #0f172a;
+            .section-icon {
+                width: 42px;
+                height: 42px;
+                border-radius: 14px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(135deg, rgba(15, 118, 110, 0.12), rgba(37, 99, 235, 0.12));
+                font-size: 1.1rem;
+            }
+
+            .section-title {
                 margin: 0;
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: var(--text);
+            }
+
+            .section-subtitle {
+                margin: 0.18rem 0 0;
+                color: var(--muted);
+                font-size: 0.92rem;
+                line-height: 1.5;
+            }
+
+            .pill-note {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                padding: 0.55rem 0.9rem;
+                border-radius: 999px;
+                background: #edf4ff;
+                border: 1px solid #cfe0ff;
+                color: #2458d3 !important;
+                font-size: 0.84rem;
+                font-weight: 600;
             }
 
             .status-box {
-                padding: 1rem;
-                border-radius: 10px;
-                margin: 1rem 0;
-                border-left: 4px solid;
-                font-weight: 500;
-                background-color: #f8fafc;
-                border: 1px solid #e2e8f0;
+                border-radius: 18px;
+                padding: 0.95rem 1rem;
+                border: 1px solid;
+                margin: 0.9rem 0 0.25rem;
+                line-height: 1.6;
             }
 
             .success-box {
-                background-color: #f0fdf4;
-                border-left-color: #16a34a;
-                color: #166534;
-                border-color: #bbf7d0;
-            }
-
-            .error-box {
-                background-color: #fef2f2;
-                border-left-color: #dc2626;
-                color: #b91c1c;
-                border-color: #fecaca;
-            }
-
-            .info-box {
-                background-color: #eff6ff;
-                border-left-color: #2563eb;
-                color: #1d4ed8;
-                border-color: #bfdbfe;
+                background: var(--success-bg);
+                border-color: var(--success-border);
+                color: var(--success-text);
             }
 
             .warning-box {
-                background-color: #fffbeb;
-                border-left-color: #d97706;
-                color: #b45309;
-                border-color: #fed7aa;
+                background: var(--warning-bg);
+                border-color: var(--warning-border);
+                color: var(--warning-text);
+            }
+
+            .error-box {
+                background: var(--error-bg);
+                border-color: var(--error-border);
+                color: var(--error-text);
+            }
+
+            .info-box {
+                background: var(--info-bg);
+                border-color: var(--info-border);
+                color: var(--info-text);
             }
 
             .stButton > button {
-                background: linear-gradient(135deg, #0f766e 0%, #1d4ed8 100%);
+                min-height: 50px;
+                border: none !important;
+                border-radius: 16px !important;
+                background: linear-gradient(135deg, var(--brand-1) 0%, var(--brand-2) 100%) !important;
                 color: #ffffff !important;
-                border: none;
-                border-radius: 10px;
-                padding: 0.75rem 1.25rem;
-                font-weight: 600;
-                transition: all 0.2s ease;
-                box-shadow: 0 4px 15px rgba(29, 78, 216, 0.2);
-                width: 100%;
+                font-weight: 700 !important;
+                box-shadow: 0 14px 28px rgba(37, 99, 235, 0.18);
+                transition: transform 0.18s ease, box-shadow 0.18s ease;
+            }
+
+            .stButton > button:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 18px 34px rgba(37, 99, 235, 0.22);
             }
 
             .stButton > button * {
@@ -152,83 +288,163 @@ def load_custom_css():
                 fill: #ffffff !important;
             }
 
-            .stButton > button:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 8px 24px rgba(29, 78, 216, 0.22);
+            .stTextInput input,
+            .stTextArea textarea,
+            .stNumberInput input,
+            .stSelectbox [data-baseweb="select"] > div {
+                background: #ffffff !important;
+                color: var(--text) !important;
+                border: 1px solid var(--line) !important;
+                border-radius: 16px !important;
+                box-shadow: none !important;
             }
 
             .stTextInput input,
-            .stTextArea textarea,
-            .stSelectbox select,
             .stNumberInput input {
-                border-radius: 8px;
-                background: #ffffff !important;
-                color: #0f172a !important;
-                border: 1px solid #cbd5e1 !important;
+                min-height: 50px;
+            }
+
+            .stTextArea textarea {
+                min-height: 140px;
+                line-height: 1.65;
+            }
+
+            .stTextInput input:focus,
+            .stTextArea textarea:focus,
+            .stNumberInput input:focus {
+                border-color: #93c5fd !important;
+                box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10) !important;
             }
 
             .stTextInput input::placeholder,
             .stTextArea textarea::placeholder {
-                color: #64748b !important;
-            }
-
-            .metric-card {
-                background: #f8fafc;
-                padding: 1rem;
-                border-radius: 10px;
-                text-align: center;
-                border: 1px solid #cbd5e1;
-            }
-
-            .progress-container {
-                background: #f8fafc;
-                border-radius: 10px;
-                padding: 1rem;
-                margin: 1rem 0;
-                border: 1px solid #cbd5e1;
-            }
-
-            .script-container {
-                background: #f8fafc;
-                border: 1px solid #e2e8f0;
-                border-radius: 12px;
-                padding: 1.25rem;
-                margin: 1rem 0;
-            }
-
-            .script-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 1rem;
-                padding-bottom: 0.5rem;
-                border-bottom: 2px solid #e2e8f0;
-            }
-
-            @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(16px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-
-            .fade-in {
-                animation: fadeIn 0.4s ease-out;
+                color: #8ca0bb !important;
             }
 
             .stTabs [data-baseweb="tab-list"] {
-                gap: 8px;
-                border-bottom: 1px solid #e2e8f0;
+                gap: 0.65rem;
+                padding: 0.35rem;
+                border-radius: 18px;
+                background: rgba(255, 255, 255, 0.82);
+                border: 1px solid var(--line);
+                margin-bottom: 1.2rem;
             }
 
             .stTabs [data-baseweb="tab"] {
-                height: 50px;
-                padding-left: 20px;
-                padding-right: 20px;
-                color: #475569 !important;
+                height: 46px;
+                border-radius: 14px;
+                color: var(--muted) !important;
+                font-weight: 700;
+                padding: 0 1rem;
                 background: transparent !important;
             }
 
             .stTabs [aria-selected="true"] {
-                color: #1d4ed8 !important;
+                background: linear-gradient(135deg, rgba(15, 118, 110, 0.10), rgba(37, 99, 235, 0.12)) !important;
+                color: var(--text) !important;
+            }
+
+            .metric-card {
+                background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+                border: 1px solid var(--line);
+                border-radius: 18px;
+                padding: 1rem;
+                text-align: center;
+                min-height: 150px;
+            }
+
+            .metric-card h4 {
+                margin: 0 0 0.35rem;
+                color: var(--muted) !important;
+                font-size: 0.88rem;
+                font-weight: 700;
+            }
+
+            .metric-card h2 {
+                margin: 0;
+                font-size: 1.65rem;
+                color: var(--text) !important;
+                font-weight: 800;
+            }
+
+            .metric-card p {
+                margin: 0.3rem 0 0;
+                color: var(--muted) !important;
+                font-size: 0.88rem;
+            }
+
+            .progress-shell {
+                background: rgba(255, 255, 255, 0.94);
+                border: 1px solid var(--line);
+                border-radius: 22px;
+                padding: 1.15rem;
+                box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+            }
+
+            .result-card {
+                background: rgba(255, 255, 255, 0.95);
+                border: 1px solid var(--line);
+                border-radius: 24px;
+                padding: 1.2rem;
+                box-shadow: 0 14px 36px rgba(15, 23, 42, 0.05);
+                margin: 0.9rem 0 1rem;
+            }
+
+            .result-head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+                padding-bottom: 0.85rem;
+                border-bottom: 1px solid var(--line);
+                margin-bottom: 1rem;
+            }
+
+            .result-head h3 {
+                margin: 0;
+                font-size: 1.12rem;
+                font-weight: 700;
+                color: var(--text);
+            }
+
+            .result-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35rem;
+                border-radius: 999px;
+                padding: 0.42rem 0.8rem;
+                background: #ecfdf5;
+                color: #047857 !important;
+                border: 1px solid #a7f3d0;
+                font-size: 0.82rem;
+                font-weight: 700;
+            }
+
+            .soft-grid {
+                display: grid;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 0.85rem;
+                margin: 0.35rem 0 1rem;
+            }
+
+            .soft-stat {
+                background: rgba(255, 255, 255, 0.92);
+                border: 1px solid var(--line);
+                border-radius: 18px;
+                padding: 1rem;
+            }
+
+            .soft-stat span {
+                display: block;
+                color: var(--muted) !important;
+                font-size: 0.82rem;
+                margin-bottom: 0.28rem;
+            }
+
+            .soft-stat strong {
+                color: var(--text);
+                font-size: 1rem;
+                font-weight: 800;
             }
 
             .stMarkdown,
@@ -239,20 +455,34 @@ def load_custom_css():
             p,
             span,
             label {
-                color: #0f172a !important;
+                color: var(--text) !important;
+            }
+
+            @media (max-width: 900px) {
+                .hero-grid,
+                .soft-grid {
+                    grid-template-columns: 1fr;
+                }
             }
 
             @media (max-width: 768px) {
-                .main-header h1 {
-                    font-size: 2rem;
+                [data-testid="stMainBlockContainer"] {
+                    padding-top: 1.2rem;
                 }
 
-                .card {
+                .hero-shell {
+                    padding: 1.4rem 1.2rem;
+                    border-radius: 22px;
+                }
+
+                .hero-title {
+                    font-size: 1.8rem;
+                }
+
+                .section-card,
+                .result-card {
                     padding: 1rem;
-                }
-
-                .main {
-                    padding: 0.5rem;
+                    border-radius: 20px;
                 }
             }
         </style>
@@ -265,9 +495,48 @@ def render_header():
     """Render phần header."""
     st.markdown(
         """
-        <div class="main-header fade-in">
-            <h1>🎙️ GT365 Radio - News Script Generator</h1>
-            <p>Tạo kịch bản từ bài báo nhanh hơn, sạch hơn và dễ biên tập hơn.</p>
+        <div class="hero-shell">
+            <div class="hero-eyebrow">🎙️ GT365 Radio Workspace</div>
+            <h1 class="hero-title">Biến bài báo thành kịch bản phát thanh rõ ràng, nhanh và chuyên nghiệp.</h1>
+            <p class="hero-copy">
+                Dán link bài báo, mô tả phong cách bạn muốn và tạo ngay kịch bản để dùng cho radio,
+                podcast, video tin tức hoặc bản đọc tổng hợp nội bộ.
+            </p>
+            <div class="hero-grid">
+                <div class="hero-stat">
+                    <span>Đầu vào</span>
+                    <strong>Nhiều nguồn bài báo</strong>
+                </div>
+                <div class="hero-stat">
+                    <span>Đầu ra</span>
+                    <strong>Kịch bản có cấu trúc rõ ràng</strong>
+                </div>
+                <div class="hero-stat">
+                    <span>Mục tiêu</span>
+                    <strong>Tối ưu cho biên tập và đọc thu âm</strong>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def _render_section_header(icon: str, title: str, subtitle: str, note: str = ""):
+    note_html = f'<div class="pill-note">{note}</div>' if note else ""
+    st.markdown(
+        f"""
+        <div class="section-card fade-in">
+            <div class="section-head">
+                <div class="section-title-wrap">
+                    <div class="section-icon">{icon}</div>
+                    <div>
+                        <h3 class="section-title">{title}</h3>
+                        <p class="section-subtitle">{subtitle}</p>
+                    </div>
+                </div>
+                {note_html}
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -276,23 +545,17 @@ def render_header():
 
 def render_input_section():
     """Render phần nhập URL."""
-    st.markdown(
-        """
-        <div class="card fade-in">
-            <div class="card-header">
-                <span class="card-icon">🔗</span>
-                <h3 class="card-title">Nguồn tin tức</h3>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    _render_section_header(
+        "🔗",
+        "Nguồn tin tức",
+        "Nhập các link bài báo cần tổng hợp để tạo kịch bản.",
+        "Đa nguồn",
     )
 
     st.markdown(
         """
         <div class="info-box">
-            <strong>🌐 Hỗ trợ đa nguồn:</strong> VnExpress, Tuổi Trẻ, Thanh Niên, Dân Trí, VTV,
-            QĐND, Nhân Dân và nhiều trang báo khác.
+            <strong>Gợi ý:</strong> Có thể nhập nhiều URL để gộp nội dung và tạo một kịch bản tổng hợp mạch lạc.
         </div>
         """,
         unsafe_allow_html=True,
@@ -306,10 +569,10 @@ def render_input_section():
 
     for i in range(st.session_state.num_url_inputs):
         url = st.text_input(
-            f"🔗 Link bài báo {i + 1}",
-            placeholder="https://vnexpress.net/... hoặc bất kỳ link bài báo hợp lệ nào",
+            f"Link bài báo {i + 1}",
+            placeholder="Dán link bài báo hợp lệ vào đây",
             key=f"url_input_{i}",
-            help="Dán link từ trang báo bạn muốn tổng hợp.",
+            help="Chấp nhận URL bắt đầu bằng http:// hoặc https://",
         )
 
         if url.strip():
@@ -317,12 +580,12 @@ def render_input_section():
                 news_urls.append(url.strip())
                 valid_urls += 1
                 st.markdown(
-                    f'<small style="color: #16a34a;">✅ URL {i + 1} hợp lệ</small>',
+                    f'<small style="color:#15803d;font-weight:600;">✓ URL {i + 1} hợp lệ</small>',
                     unsafe_allow_html=True,
                 )
             else:
                 st.markdown(
-                    f'<small style="color: #dc2626;">❌ URL {i + 1} không hợp lệ, cần bắt đầu bằng http/https</small>',
+                    f'<small style="color:#be123c;font-weight:600;">✕ URL {i + 1} chưa hợp lệ, cần bắt đầu bằng http/https</small>',
                     unsafe_allow_html=True,
                 )
 
@@ -341,7 +604,7 @@ def render_input_section():
                 st.rerun()
 
     with col_clear:
-        if st.button("🗑️ Xóa tất cả", use_container_width=True):
+        if st.button("🧹 Xóa tất cả", use_container_width=True):
             for i in range(st.session_state.num_url_inputs):
                 st.session_state[f"url_input_{i}"] = ""
             st.rerun()
@@ -350,7 +613,7 @@ def render_input_section():
         st.markdown(
             f"""
             <div class="success-box">
-                <strong>📊 Trạng thái:</strong> Đã nhập {valid_urls} URL hợp lệ, sẵn sàng xử lý.
+                <strong>Sẵn sàng xử lý:</strong> Đã nhập {valid_urls} URL hợp lệ.
             </div>
             """,
             unsafe_allow_html=True,
@@ -359,7 +622,7 @@ def render_input_section():
         st.markdown(
             """
             <div class="info-box">
-                <strong>💡 Hướng dẫn:</strong> Nhập ít nhất một URL hợp lệ để bắt đầu.
+                <strong>Bắt đầu tại đây:</strong> Nhập ít nhất một URL hợp lệ để Agent lấy nội dung bài báo.
             </div>
             """,
             unsafe_allow_html=True,
@@ -370,53 +633,41 @@ def render_input_section():
 
 def render_prompt_section():
     """Render phần nhập prompt."""
-    st.markdown(
-        """
-        <div class="card fade-in">
-            <div class="card-header">
-                <span class="card-icon">💬</span>
-                <h3 class="card-title">Prompt tùy chỉnh</h3>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    _render_section_header(
+        "💬",
+        "Prompt tùy chỉnh",
+        "Mô tả rõ phong cách, thời lượng và cấu trúc đầu ra bạn muốn.",
+        "Creative brief",
     )
 
-    user_prompt = st.text_area(
-        "💬 Mô tả chi tiết yêu cầu của bạn",
+    return st.text_area(
+        "Mô tả yêu cầu của bạn",
         placeholder=(
             "Ví dụ:\n"
-            "• Tạo kịch bản YouTube 8 phút về công nghệ, giọng điệu chuyên nghiệp nhưng dễ hiểu\n"
-            "• Viết script podcast 15 phút, có intro hấp dẫn, phần chính phân tích sâu và outro có call-to-action\n"
-            "• Tạo nội dung TikTok 90 giây, năng động, phù hợp Gen Z\n"
-            "• Viết bài thuyết trình 10 phút cho doanh nghiệp, trang trọng và có số liệu cụ thể"
+            "• Viết kịch bản podcast 8 phút, giọng điệu chuyên nghiệp nhưng dễ nghe\n"
+            "• Tạo bản tin ngắn 3 phút, mở đầu trực diện, ưu tiên số liệu quan trọng\n"
+            "• Viết script YouTube có intro mạnh, nội dung phân tích sâu và kết thúc gọn\n"
+            "• Tạo kịch bản trang trọng cho bản đọc nội bộ doanh nghiệp"
         ),
-        height=140,
-        help="Prompt càng rõ thì kết quả càng sát yêu cầu.",
+        height=150,
+        help="Prompt càng rõ, kết quả càng sát yêu cầu.",
     )
-
-    return user_prompt
 
 
 def render_config_section():
     """Render phần cấu hình."""
-    st.markdown(
-        """
-        <div class="card fade-in">
-            <div class="card-header">
-                <span class="card-icon">⚙️</span>
-                <h3 class="card-title">Cấu hình kịch bản</h3>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
+    _render_section_header(
+        "⚙️",
+        "Cấu hình kịch bản",
+        "Thiết lập độ dài và số phiên bản trước khi tạo nội dung.",
+        "Output setup",
     )
 
     col_config1, col_config2, col_config3 = st.columns(3)
 
     with col_config1:
         script_length = st.selectbox(
-            "⏱️ Độ dài",
+            "Độ dài",
             options=[
                 "Ngắn (1-2 phút)",
                 "Trung bình (3-5 phút)",
@@ -428,18 +679,19 @@ def render_config_section():
         )
 
     with col_config2:
-        if script_length == "Tùy chỉnh":
-            custom_length = st.number_input("Số phút", min_value=1, max_value=30, value=5)
-        else:
-            custom_length = None
+        custom_length = (
+            st.number_input("Số phút", min_value=1, max_value=30, value=5)
+            if script_length == "Tùy chỉnh"
+            else None
+        )
 
     with col_config3:
         num_scripts = st.number_input(
-            "📄 Số lượng phiên bản",
+            "Số lượng phiên bản",
             min_value=1,
             max_value=3,
             value=1,
-            help="Tạo nhiều phiên bản nếu bạn muốn so sánh phong cách.",
+            help="Tạo nhiều phiên bản để so sánh phong cách trình bày.",
         )
 
     return script_length, custom_length, num_scripts
@@ -449,13 +701,12 @@ def render_progress_bar(progress_value, status_text):
     """Render thanh tiến trình."""
     st.markdown(
         """
-        <div class="progress-container">
-            <h4>🤖 News Agent đang xử lý...</h4>
+        <div class="progress-shell">
+            <strong>🤖 Agent đang xử lý yêu cầu của bạn</strong>
         </div>
         """,
         unsafe_allow_html=True,
     )
-
     progress_bar = st.progress(progress_value)
     status_display = st.empty()
     status_display.text(status_text)
@@ -467,10 +718,10 @@ def render_results_tab():
     if "scripts" not in st.session_state or not st.session_state.scripts:
         st.markdown(
             """
-            <div class="card">
-                <div style="text-align: center; padding: 2rem;">
-                    <h3>📄 Chưa có kịch bản nào</h3>
-                    <p>Hãy tạo kịch bản ở tab "Tạo kịch bản" trước.</p>
+            <div class="section-card">
+                <div style="text-align:center; padding:1.2rem 0.6rem;">
+                    <h3 style="margin:0 0 0.45rem;">Chưa có kịch bản nào</h3>
+                    <p style="margin:0; color:#5b6b84;">Tạo kịch bản ở tab đầu tiên, kết quả sẽ hiển thị tại đây.</p>
                 </div>
             </div>
             """,
@@ -481,41 +732,47 @@ def render_results_tab():
     scripts = st.session_state.scripts
     article_info = st.session_state.article_info
 
+    _render_section_header(
+        "📰",
+        "Thông tin nguồn",
+        "Tóm tắt nhanh dữ liệu đầu vào đã được dùng để tạo kịch bản.",
+        "Overview",
+    )
+
+    title = article_info.get("title", "N/A")
+    short_title = title if len(title) <= 48 else f"{title[:48]}..."
+
     st.markdown(
-        """
-        <div class="card fade-in">
-            <div class="card-header">
-                <span class="card-icon">📰</span>
-                <h3 class="card-title">Thông tin nguồn</h3>
+        f"""
+        <div class="soft-grid">
+            <div class="soft-stat">
+                <span>Tiêu đề</span>
+                <strong>{short_title}</strong>
+            </div>
+            <div class="soft-stat">
+                <span>Nguồn</span>
+                <strong>{article_info.get("source", "N/A")}</strong>
+            </div>
+            <div class="soft-stat">
+                <span>Số từ gốc</span>
+                <strong>{article_info.get("word_count", 0)}</strong>
+            </div>
+            <div class="soft-stat">
+                <span>Số kịch bản</span>
+                <strong>{len(scripts)}</strong>
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    col_info1, col_info2, col_info3, col_info4 = st.columns(4)
-
-    with col_info1:
-        title = article_info.get("title", "N/A")
-        short_title = title if len(title) <= 24 else f"{title[:24]}..."
-        st.metric("📰 Tiêu đề", short_title)
-
-    with col_info2:
-        st.metric("🌐 Nguồn", article_info.get("source", "N/A"))
-
-    with col_info3:
-        st.metric("📝 Số từ gốc", article_info.get("word_count", 0))
-
-    with col_info4:
-        st.metric("📄 Kịch bản tạo", len(scripts))
-
     for i, script in enumerate(scripts, 1):
         st.markdown(
             f"""
-            <div class="script-container fade-in">
-                <div class="script-header">
+            <div class="result-card fade-in">
+                <div class="result-head">
                     <h3>📝 Kịch bản {i}</h3>
-                    <span style="color: #64748b;">Phiên bản {i}</span>
+                    <div class="result-badge">Phiên bản {i}</div>
                 </div>
             </div>
             """,
@@ -525,7 +782,7 @@ def render_results_tab():
         st.text_area(
             f"Nội dung kịch bản {i}",
             value=script,
-            height=400,
+            height=420,
             key=f"script_display_{i}",
             help="Có thể sao chép nội dung trực tiếp từ đây.",
         )
@@ -540,9 +797,9 @@ def render_results_tab():
             st.markdown(
                 f"""
                 <div class="metric-card">
-                    <h4>📝 Số từ</h4>
+                    <h4>Số từ</h4>
                     <h2>{word_count:,}</h2>
-                    <p>từ</p>
+                    <p>đơn vị từ</p>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -552,9 +809,9 @@ def render_results_tab():
             st.markdown(
                 f"""
                 <div class="metric-card">
-                    <h4>🔤 Ký tự</h4>
+                    <h4>Ký tự</h4>
                     <h2>{char_count:,}</h2>
-                    <p>ký tự</p>
+                    <p>toàn bộ nội dung</p>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -564,9 +821,9 @@ def render_results_tab():
             st.markdown(
                 f"""
                 <div class="metric-card">
-                    <h4>⏱️ Thời lượng</h4>
+                    <h4>Thời lượng</h4>
                     <h2>{estimated_time:.1f}</h2>
-                    <p>phút</p>
+                    <p>phút đọc</p>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -577,7 +834,7 @@ def render_results_tab():
                 try:
                     doc_buffer = st.session_state.agent.create_document(script, i)
                     st.download_button(
-                        label="💾 Tải xuống",
+                        label="💾 Tải xuống .docx",
                         data=doc_buffer,
                         file_name=f"GT365_Script_{i}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx",
                         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -588,21 +845,12 @@ def render_results_tab():
                     st.error(f"Lỗi tạo file: {exc}")
 
         if i < len(scripts):
-            st.markdown("---")
+            st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
 
 
 def render_footer():
-    """Render footer."""
-    st.markdown("---")
-    st.markdown(
-        """
-        <div style="text-align: center; padding: 1.5rem; color: #64748b; background: #f8fafc; border-radius: 10px; margin-top: 2rem; border: 1px solid #e2e8f0;">
-            <p><strong>🎙️ GT365 Radio - News Script Generator</strong></p>
-            <p style="font-size: 0.9rem;">📧 support@gt365radio.com • 📱 1900-xxxx • 🌐 gt365radio.com</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    """Giữ lại để tương thích, hiện không render footer."""
+    return
 
 
 def show_success_message(num_scripts, num_articles):
@@ -610,7 +858,7 @@ def show_success_message(num_scripts, num_articles):
     st.markdown(
         f"""
         <div class="success-box fade-in">
-            <strong>🎉 Thành công!</strong> Đã tạo {num_scripts} kịch bản từ {num_articles} bài báo.
+            <strong>Hoàn tất:</strong> Đã tạo {num_scripts} kịch bản từ {num_articles} bài báo.
         </div>
         """,
         unsafe_allow_html=True,
@@ -619,9 +867,9 @@ def show_success_message(num_scripts, num_articles):
 
 def show_error_message(error_msg):
     """Hiển thị thông báo lỗi."""
-    st.markdown(f'<div class="error-box">❌ Lỗi: {error_msg}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="error-box"><strong>Lỗi:</strong> {error_msg}</div>', unsafe_allow_html=True)
 
 
 def show_warning_message(warning_msg):
     """Hiển thị thông báo cảnh báo."""
-    st.markdown(f'<div class="warning-box">⚠️ {warning_msg}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="warning-box"><strong>Lưu ý:</strong> {warning_msg}</div>', unsafe_allow_html=True)
