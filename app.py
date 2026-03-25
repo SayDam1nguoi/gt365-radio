@@ -6,6 +6,7 @@ import os
 import sys
 
 from dotenv import load_dotenv
+import streamlit as st
 
 load_dotenv()
 
@@ -21,6 +22,12 @@ MODEL_OPTIONS = {
     "Claude 3 Haiku": "claude-3-haiku-20240307",
     "Claude 3 Sonnet": "claude-3-sonnet-20240229",
 }
+
+
+def rerun_app():
+    """Rerun tương thích nhiều phiên bản Streamlit."""
+    rerun_fn = getattr(st, "rerun", None) or getattr(st, "experimental_rerun")
+    rerun_fn()
 
 
 def get_provider_for_model(model_name: str) -> str:
@@ -62,25 +69,34 @@ def ensure_agent(model_name: str, api_key: str):
         st.session_state.agent_api_key = api_key
 
 
+def ensure_ui_state():
+    """Khởi tạo state cho UI điều hướng và tiến trình."""
+    if "total_scripts" not in st.session_state:
+        st.session_state.total_scripts = 0
+    if "active_tab" not in st.session_state:
+        st.session_state.active_tab = "Tạo kịch bản"
+    if "processing_state" not in st.session_state:
+        st.session_state.processing_state = None
+    if "result_navigation_ready" not in st.session_state:
+        st.session_state.result_navigation_ready = False
+
+
 def main():
     """Điểm vào chính của ứng dụng."""
     setup_page_config()
     load_custom_css()
+    ensure_ui_state()
     render_header()
 
     st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
     render_supported_sources()
     st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
 
-    if "total_scripts" not in st.session_state:
-        st.session_state.total_scripts = 0
-
-    tab_tao, tab_ket_qua = st.tabs(["Tạo kịch bản", "Kết quả"])
-
-    with tab_tao:
+    active_tab = render_tab_navigation()
+    if active_tab == "Tạo kịch bản":
         handle_script_creation()
-
-    with tab_ket_qua:
+    else:
+        st.session_state.result_navigation_ready = False
         render_results_tab()
 
 
@@ -96,6 +112,21 @@ def handle_script_creation():
 
     render_ai_status(selected_label, selected_model, api_key_source, bool(resolved_api_key))
     st.markdown("<div style='height: 0.6rem;'></div>", unsafe_allow_html=True)
+
+    progress_hosts = {
+        "panel": st.empty(),
+        "bar": st.empty(),
+        "detail": st.empty(),
+        "caption": st.empty(),
+    }
+
+    if st.session_state.get("result_navigation_ready") and st.session_state.get("agent_results"):
+        results = st.session_state.agent_results
+        show_success_message(len(results.get("scripts", [])), len(results.get("articles", [])))
+        if render_result_switch_button():
+            st.session_state.active_tab = "Kết quả"
+            st.session_state.result_navigation_ready = False
+            rerun_app()
 
     if st.button("Tạo kịch bản chuyên nghiệp", type="primary", use_container_width=True):
         if not news_urls:
@@ -115,10 +146,39 @@ def handle_script_creation():
         final_length = (
             f"{custom_length} phút" if script_length == "Tùy chỉnh" and custom_length else script_length
         )
-        process_news_to_script(news_urls, user_prompt, final_length, num_scripts)
+        process_news_to_script(news_urls, user_prompt, final_length, num_scripts, progress_hosts)
 
 
-def process_news_to_script(urls, prompt, length, num_scripts):
+def render_processing_state(progress_hosts, payload):
+    """Vẽ panel tiến trình trong đúng vùng UI hiện tại."""
+    detail_parts = []
+    current_item = payload.get("current_item")
+    total_items = payload.get("total_items")
+    current_script = payload.get("current_script")
+    total_scripts = payload.get("total_scripts")
+    completed_units = payload.get("completed_units")
+    total_units = payload.get("total_units")
+
+    if current_item and total_items:
+        detail_parts.append(f"URL {current_item}/{total_items}")
+    if current_script and total_scripts:
+        detail_parts.append(f"Kịch bản {current_script}/{total_scripts}")
+
+    detail_text = " · ".join(detail_parts)
+    caption_text = ""
+    if completed_units is not None and total_units:
+        caption_text = f"Tiến độ thực tế theo khối lượng công việc: {completed_units}/{total_units}"
+
+    render_progress_bar(
+        payload.get("percent", 0),
+        payload.get("status", "Đang xử lý..."),
+        detail_text=detail_text,
+        caption_text=caption_text,
+        hosts=progress_hosts,
+    )
+
+
+def process_news_to_script(urls, prompt, length, num_scripts, progress_hosts):
     """Tạo kịch bản từ danh sách URL."""
     agent = st.session_state.agent
 
@@ -131,6 +191,16 @@ def process_news_to_script(urls, prompt, length, num_scripts):
             )
             return
 
+        st.session_state.processing_state = {"percent": 0, "status": "Đang chuẩn bị xử lý..."}
+        st.session_state.result_navigation_ready = False
+        render_processing_state(progress_hosts, st.session_state.processing_state)
+
+        def progress_callback(payload):
+            st.session_state.processing_state = payload
+            render_processing_state(progress_hosts, payload)
+
+        agent.set_progress_callback(progress_callback)
+
         success, results = agent.process_multiple_news_to_script(
             urls=urls,
             prompt=prompt,
@@ -141,11 +211,24 @@ def process_news_to_script(urls, prompt, length, num_scripts):
 
         if success:
             save_results_to_session(results)
+            st.session_state.result_navigation_ready = True
+            st.session_state.processing_state = {
+                **st.session_state.processing_state,
+                "percent": 100,
+                "status": "Hoàn tất tạo kịch bản. Bạn có thể chuyển sang tab kết quả.",
+            }
+            render_processing_state(progress_hosts, st.session_state.processing_state)
             show_success_message(len(results["scripts"]), len(results.get("articles", [])))
+            if render_result_switch_button():
+                st.session_state.active_tab = "Kết quả"
+                st.session_state.result_navigation_ready = False
+                rerun_app()
         else:
             show_error_message(results.get("error", "Không xác định"))
     except Exception as exc:
         show_error_message(f"Lỗi hệ thống: {exc}")
+    finally:
+        agent.set_progress_callback(None)
 
 
 def save_results_to_session(results):

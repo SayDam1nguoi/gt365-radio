@@ -1,0 +1,4 @@
+Bước 1:
+pip install -r requirements_app.txt
+bước 2:
+streamlit run app.py

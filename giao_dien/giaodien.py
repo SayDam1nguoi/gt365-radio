@@ -3,10 +3,17 @@ Các hàm giao diện cho GT365 Radio News Script Generator.
 """
 
 from datetime import datetime
+from html import escape
 
 import streamlit as st
 
 from .styles import get_custom_css_string
+
+
+def _rerun_streamlit():
+    """Rerun tương thích nhiều phiên bản Streamlit."""
+    rerun_fn = getattr(st, "rerun", None) or getattr(st, "experimental_rerun")
+    rerun_fn()
 
 
 def setup_page_config():
@@ -28,12 +35,12 @@ def render_header():
     """Hiển thị khối mở đầu."""
     st.markdown(
         """
-        <div class="hero-shell">
+        <div class="hero-shell fade-in">
             <div class="hero-eyebrow">GT365 Radio Workspace</div>
-            <h1 class="hero-title">Biến bài báo thành kịch bản phát thanh rõ ràng, nhanh và chuyên nghiệp.</h1>
+            <h1 class="hero-title">Biến bài báo thành<br><em>kịch bản phát thanh</em></h1>
             <p class="hero-copy">
-                Dán link bài báo, mô tả phong cách bạn muốn và tạo ngay kịch bản để dùng cho radio,
-                podcast, video tin tức hoặc bản đọc tổng hợp nội bộ.
+                Dán link bài báo, mô tả phong cách bạn muốn và nhận kịch bản sẵn sàng cho radio,
+                podcast hoặc bản tin video trong vài chục giây.
             </p>
             <div class="hero-grid">
                 <div class="hero-stat">
@@ -45,8 +52,8 @@ def render_header():
                     <strong>Kịch bản có cấu trúc rõ ràng</strong>
                 </div>
                 <div class="hero-stat">
-                    <span>Mục tiêu</span>
-                    <strong>Tối ưu cho biên tập và đọc thu âm</strong>
+                    <span>Tối ưu cho</span>
+                    <strong>Biên tập và thu âm</strong>
                 </div>
             </div>
         </div>
@@ -68,7 +75,7 @@ def _render_section_header(icon: str, title: str, subtitle: str = "", note: str 
                     <div class="section-icon">{icon}</div>
                     <div class="section-copy">
                         <div class="section-kicker">Mục nội dung</div>
-                        <h3 class="section-title">{title}</h3>
+                        <div class="section-title">{title}</div>
                         {subtitle_html}
                     </div>
                 </div>
@@ -80,12 +87,43 @@ def _render_section_header(icon: str, title: str, subtitle: str = "", note: str 
     )
 
 
+def render_supported_sources():
+    """Hiển thị danh sách các nguồn báo được hỗ trợ."""
+    sources_list = [
+        ("Quân Đội Nhân Dân", "qdnd.vn"),
+        ("VTV Tin tức", "vtv.vn"),
+        ("Nhân Dân", "nhandan.vn"),
+        ("Tuổi Trẻ Online", "tuoitre.vn"),
+        ("VnExpress", "vnexpress.net"),
+        ("Dân trí", "dantri.com.vn"),
+        ("Thanh Niên", "thanhnien.vn"),
+        ("Lao Động", "laodong.vn"),
+        ("Người Lao Động", "nld.com.vn"),
+        ("Công an Nhân dân", "cand.com.vn"),
+        ("Báo Pháp luật Việt Nam", "baophapluat.vn"),
+    ]
+
+    with st.expander("🌐  Các trang báo được hỗ trợ  ·  11 nguồn", expanded=False):
+        cols = st.columns(4)
+        for idx, (name, domain) in enumerate(sources_list):
+            with cols[idx % 4]:
+                st.markdown(
+                    f"""
+                    <div class="source-chip">
+                        <div class="source-chip__name">{name}</div>
+                        <div class="source-chip__domain">{domain}</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+
 def render_input_section():
     """Hiển thị phần nhập danh sách link bài báo."""
     _render_section_header(
         "📰",
         "Nguồn tin đầu vào",
-        "Nhập các đường dẫn bài báo mà bạn muốn tổng hợp thành kịch bản.",
+        "Nhập các đường dẫn bài báo muốn tổng hợp thành kịch bản.",
         "Input",
     )
 
@@ -105,8 +143,8 @@ def render_input_section():
 
     for i in range(st.session_state.num_url_inputs):
         url = st.text_input(
-            f"Link bài báo {i + 1}",
-            placeholder="Dán link bài báo hợp lệ vào đây",
+            f"Link {i + 1}",
+            placeholder="https://vnexpress.net/...",
             key=f"url_input_{i}",
         )
 
@@ -120,26 +158,26 @@ def render_input_section():
                 )
             else:
                 st.markdown(
-                    f'<div class="inline-error">URL {i + 1} chưa hợp lệ, cần bắt đầu bằng http hoặc https</div>',
+                    f'<div class="inline-error">URL {i + 1} phải bắt đầu bằng http:// hoặc https://</div>',
                     unsafe_allow_html=True,
                 )
 
     col_add, col_remove, col_clear = st.columns(3)
 
     with col_add:
-        if st.button("Thêm link", use_container_width=True):
+        if st.button("＋  Thêm link", use_container_width=True):
             if st.session_state.num_url_inputs < 10:
                 st.session_state.num_url_inputs += 1
                 st.rerun()
 
     with col_remove:
-        if st.button("Bớt link", use_container_width=True):
+        if st.button("－  Bớt link", use_container_width=True):
             if st.session_state.num_url_inputs > 1:
                 st.session_state.num_url_inputs -= 1
                 st.rerun()
 
     with col_clear:
-        if st.button("Xóa tất cả", use_container_width=True):
+        if st.button("✕  Xóa tất cả", use_container_width=True):
             st.session_state.clear_all_flag = True
             st.rerun()
 
@@ -147,7 +185,8 @@ def render_input_section():
         st.markdown(
             f"""
             <div class="success-box status-box">
-                <strong>Sẵn sàng xử lý:</strong> Đã nhận {valid_urls} URL hợp lệ.
+                <strong>{valid_urls} URL sẵn sàng xử lý.</strong>
+                {"Tất cả link đã hợp lệ." if valid_urls == st.session_state.num_url_inputs else "Một số ô đang để trống."}
             </div>
             """,
             unsafe_allow_html=True,
@@ -161,20 +200,20 @@ def render_prompt_section():
     _render_section_header(
         "✍️",
         "Yêu cầu biên tập",
-        "Mô tả giọng điệu, độ dài và cách triển khai bạn muốn cho kịch bản.",
+        "Mô tả giọng điệu, phong cách và cách triển khai bạn muốn.",
         "Prompt",
     )
 
     return st.text_area(
-        "Mô tả yêu cầu của bạn",
+        "Mô tả yêu cầu",
         placeholder=(
             "Ví dụ:\n"
             "- Viết kịch bản podcast 8 phút, giọng điệu chuyên nghiệp nhưng dễ nghe\n"
-            "- Tạo bản tin ngắn 3 phút, mở đầu trực diện, ưu tiên số liệu quan trọng\n"
-            "- Viết script YouTube có intro mạnh, nội dung phân tích sâu và kết thúc gọn\n"
-            "- Tạo kịch bản trang trọng cho bản đọc nội bộ doanh nghiệp"
+            "- Bản tin ngắn 3 phút, mở đầu trực diện, ưu tiên số liệu quan trọng\n"
+            "- Script YouTube có intro mạnh, phân tích sâu, kết thúc gọn\n"
+            "- Kịch bản trang trọng cho bản đọc nội bộ doanh nghiệp"
         ),
-        height=170,
+        height=160,
     )
 
 
@@ -184,94 +223,139 @@ def render_config_section():
         "⚙️",
         "Cấu hình đầu ra",
         "Chọn thời lượng và số phiên bản muốn tạo.",
-        "Output",
+        "Config",
     )
 
-    col_config1, col_config2, col_config3 = st.columns(3)
+    col1, col2, col3 = st.columns([2, 1, 1])
 
-    with col_config1:
+    with col1:
         script_length = st.selectbox(
-            "Độ dài",
+            "Độ dài kịch bản",
             options=[
-                "Ngắn (1-2 phút)",
-                "Trung bình (3-5 phút)",
-                "Dài (5-10 phút)",
-                "Rất dài (10-15 phút)",
+                "Ngắn (1–2 phút)",
+                "Trung bình (3–5 phút)",
+                "Dài (5–10 phút)",
+                "Rất dài (10–15 phút)",
                 "Tùy chỉnh",
             ],
         )
 
-    with col_config2:
-        custom_length = (
-            st.number_input("Số phút", min_value=1, max_value=30, value=5)
-            if script_length == "Tùy chỉnh"
-            else None
-        )
+    with col2:
+        custom_length = None
+        if script_length == "Tùy chỉnh":
+            custom_length = st.number_input("Số phút", min_value=1, max_value=30, value=5)
+        else:
+            st.markdown("<div style='height:68px'></div>", unsafe_allow_html=True)
 
-    with col_config3:
-        num_scripts = st.number_input("Số lượng phiên bản", min_value=1, max_value=3, value=1)
+    with col3:
+        num_scripts = st.number_input("Số phiên bản", min_value=1, max_value=3, value=1)
 
     return script_length, custom_length, num_scripts
 
 
 def render_ai_section(model_options: dict):
-    """Hiển thị phần chọn model và API key."""
-    _render_section_header(
-        "🤖",
-        "Cấu hình AI",
-        "Chọn model sử dụng và nhập API key nếu bạn không muốn dùng biến môi trường.",
-        "AI",
-    )
-
+    """Ẩn khỏi UI, giữ để tương thích với app."""
     model_labels = list(model_options.keys())
-    default_label = st.session_state.get("selected_model_label", model_labels[0])
-    if default_label not in model_labels:
-        default_label = model_labels[0]
-
-    col_model, col_key = st.columns([1.1, 1.4])
-
-    with col_model:
-        selected_label = st.selectbox(
-            "Model",
-            options=model_labels,
-            index=model_labels.index(default_label),
-        )
-
-    with col_key:
-        manual_api_key = st.text_input(
-            "API key",
-            type="password",
-            value=st.session_state.get("manual_api_key", ""),
-            placeholder="Để trống nếu muốn dùng API key từ biến môi trường",
-            help="Hệ thống sẽ ưu tiên key nhập tại đây. Nếu để trống, app sẽ tự đọc biến môi trường tương ứng với model.",
-        )
-
-    st.session_state.selected_model_label = selected_label
-    st.session_state.manual_api_key = manual_api_key
-    return selected_label, model_options[selected_label], manual_api_key
+    default_label = model_labels[0]
+    return default_label, model_options[default_label], ""
 
 
-def render_ai_status(selected_label: str, selected_model: str, api_key_source: str, has_api_key: bool):
-    """Hiển thị trạng thái model và API key đang dùng."""
-    key_status = "Đã sẵn sàng" if has_api_key else "Chưa có API key"
-    key_source_label = "nhập trực tiếp" if api_key_source == "manual" else f"biến môi trường {api_key_source}"
-    status_class = "success-box" if has_api_key else "warning-box"
+def render_ai_status(*args, **kwargs):
+    """Ẩn khỏi UI."""
+    return
 
+
+def render_tab_navigation():
+    """Hiển thị điều hướng tab có thể điều khiển bằng session state."""
     st.markdown(
-        f"""
-        <div class="{status_class} status-box">
-            <strong>Model đang chọn:</strong> {selected_label} ({selected_model})<br>
-            <strong>API key:</strong> {key_status} - nguồn: {key_source_label}
+        """
+        <div class="tab-nav-shell fade-in">
+            <div class="tab-nav-copy">
+                <span>Không gian làm việc</span>
+                <strong>Chuyển nhanh giữa phần tạo kịch bản và kết quả</strong>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
+    active_tab = st.session_state.get("active_tab", "Tạo kịch bản")
+    col_create, col_result = st.columns(2)
 
-def render_progress_bar(progress_value, status_text):
-    """Giữ lại để tương thích, hiện không dùng loading riêng."""
-    st.info(f"{status_text} ({progress_value}%)")
+    with col_create:
+        if st.button(
+            "● Tạo kịch bản" if active_tab == "Tạo kịch bản" else "Tạo kịch bản",
+            key="nav_create_tab",
+            type="secondary",
+            use_container_width=True,
+        ):
+            st.session_state.active_tab = "Tạo kịch bản"
+            _rerun_streamlit()
+
+    with col_result:
+        if st.button(
+            "● Kết quả" if active_tab == "Kết quả" else "Kết quả",
+            key="nav_result_tab",
+            type="secondary",
+            use_container_width=True,
+        ):
+            st.session_state.active_tab = "Kết quả"
+            _rerun_streamlit()
+
+    st.markdown("<div style='height: 0.8rem;'></div>", unsafe_allow_html=True)
+    return active_tab
+
+
+def render_progress_bar(progress_value, status_text, detail_text="", caption_text="", hosts=None):
+    """Hiển thị panel tiến trình xử lý theo trạng thái thực tế."""
+    safe_status = escape(str(status_text))
+    panel_html = f"""
+        <div class="progress-shell fade-in">
+            <div class="progress-head">
+                <div>
+                    <div class="progress-kicker">Đang xử lý</div>
+                    <div class="progress-status">{safe_status}</div>
+                </div>
+                <div class="progress-percent">{progress_value}%</div>
+            </div>
+        </div>
+        """
+
+    if hosts:
+        hosts["panel"].markdown(panel_html, unsafe_allow_html=True)
+        hosts["bar"].progress(max(0, min(100, int(progress_value))) / 100)
+
+        if detail_text:
+            hosts["detail"].markdown(
+                f"<div class='progress-detail'>{escape(str(detail_text))}</div>",
+                unsafe_allow_html=True,
+            )
+        else:
+            hosts["detail"].empty()
+
+        if caption_text:
+            hosts["caption"].caption(str(caption_text))
+        else:
+            hosts["caption"].empty()
+        return None, None
+
+    st.markdown(panel_html, unsafe_allow_html=True)
+    st.progress(max(0, min(100, int(progress_value))) / 100)
+
+    if detail_text:
+        st.markdown(
+            f"<div class='progress-detail'>{escape(str(detail_text))}</div>",
+            unsafe_allow_html=True,
+        )
+    if caption_text:
+        st.caption(str(caption_text))
+
     return None, None
+
+
+def render_result_switch_button():
+    """Hiển thị nút đưa người dùng sang tab kết quả."""
+    return st.button("Mở tab kết quả", use_container_width=True)
 
 
 def render_results_tab():
@@ -279,9 +363,10 @@ def render_results_tab():
     if "scripts" not in st.session_state or not st.session_state.scripts:
         st.markdown(
             """
-            <div class="empty-state">
+            <div class="empty-state fade-in">
+                <div class="empty-state-icon">🎙️</div>
                 <h3>Chưa có kịch bản nào</h3>
-                <p>Tạo kịch bản ở tab đầu tiên, kết quả sẽ hiển thị tại đây.</p>
+                <p>Tạo kịch bản ở tab <strong>Tạo kịch bản</strong>, kết quả sẽ hiển thị tại đây.</p>
             </div>
             """,
             unsafe_allow_html=True,
@@ -294,16 +379,16 @@ def render_results_tab():
     _render_section_header(
         "📁",
         "Tổng quan kết quả",
-        "Tóm tắt nhanh dữ liệu đầu vào và số lượng kịch bản đã tạo.",
+        "Thông tin bài báo gốc và số lượng kịch bản đã tạo.",
         "Overview",
     )
 
     title = article_info.get("title", "N/A")
-    short_title = title if len(title) <= 56 else f"{title[:56]}..."
+    short_title = title if len(title) <= 52 else f"{title[:52]}…"
 
     st.markdown(
         f"""
-        <div class="soft-grid">
+        <div class="soft-grid fade-in">
             <div class="soft-stat">
                 <span>Tiêu đề</span>
                 <strong>{short_title}</strong>
@@ -314,11 +399,11 @@ def render_results_tab():
             </div>
             <div class="soft-stat">
                 <span>Số từ gốc</span>
-                <strong>{article_info.get("word_count", 0)}</strong>
+                <strong>{article_info.get("word_count", 0):,}</strong>
             </div>
             <div class="soft-stat">
-                <span>Số kịch bản</span>
-                <strong>{len(scripts)}</strong>
+                <span>Kịch bản</span>
+                <strong>{len(scripts)} phiên bản</strong>
             </div>
         </div>
         """,
@@ -336,9 +421,9 @@ def render_results_tab():
                 <div class="result-head">
                     <div class="result-title-wrap">
                         <div class="result-index">{i:02d}</div>
-                        <div>
-                            <h3>Kịch bản {i}</h3>
-                            <p>Bản nội dung đã được tối ưu để biên tập và đọc thu âm.</p>
+                        <div class="result-copy">
+                            <div class="result-title">Kịch bản {i}</div>
+                            <div class="result-subtitle">Đã tối ưu để biên tập và đọc thu âm.</div>
                         </div>
                     </div>
                     <div class="result-badge">Phiên bản {i}</div>
@@ -349,36 +434,36 @@ def render_results_tab():
         )
 
         st.text_area(
-            f"Nội dung kịch bản {i}",
+            f"script_{i}",
             value=script,
-            height=380,
+            height=360,
             key=f"script_display_{i}",
             label_visibility="collapsed",
         )
 
-        col_stat1, col_stat2, col_stat3, col_stat4 = st.columns(4)
+        col1, col2, col3, col4 = st.columns(4)
 
-        with col_stat1:
+        with col1:
             st.markdown(
-                f'<div class="metric-card"><h4>Số từ</h4><h2>{word_count:,}</h2><p>đơn vị từ</p></div>',
+                f'<div class="metric-card"><div class="metric-label">Số từ</div><div class="metric-value">{word_count:,}</div><div class="metric-note">từ</div></div>',
                 unsafe_allow_html=True,
             )
-        with col_stat2:
+        with col2:
             st.markdown(
-                f'<div class="metric-card"><h4>Ký tự</h4><h2>{char_count:,}</h2><p>toàn bộ nội dung</p></div>',
+                f'<div class="metric-card"><div class="metric-label">Ký tự</div><div class="metric-value">{char_count:,}</div><div class="metric-note">ký tự</div></div>',
                 unsafe_allow_html=True,
             )
-        with col_stat3:
+        with col3:
             st.markdown(
-                f'<div class="metric-card"><h4>Thời lượng</h4><h2>{estimated_time:.1f}</h2><p>phút đọc</p></div>',
+                f'<div class="metric-card"><div class="metric-label">Thời lượng</div><div class="metric-value">{estimated_time:.1f}</div><div class="metric-note">phút đọc</div></div>',
                 unsafe_allow_html=True,
             )
-        with col_stat4:
+        with col4:
             if "agent" in st.session_state:
                 try:
                     doc_buffer = st.session_state.agent.create_document(script, i)
                     st.download_button(
-                        label="Tải xuống .docx",
+                        label="⬇  Tải xuống .docx",
                         data=doc_buffer,
                         file_name=f"GT365_Script_{i}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx",
                         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -388,11 +473,11 @@ def render_results_tab():
                 except Exception as exc:
                     st.error(f"Lỗi tạo file: {exc}")
 
-        st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 1.2rem;'></div>", unsafe_allow_html=True)
 
 
 def render_footer():
-    """Giữ lại để tương thích."""
+    """Tương thích ngược."""
     return
 
 
@@ -400,12 +485,12 @@ def show_success_message(num_scripts, num_articles):
     """Hiển thị thông báo tạo thành công."""
     st.markdown(
         f"""
-        <div class="success-banner">
+        <div class="success-banner fade-in">
             <div class="success-banner__icon">✅</div>
             <div>
-                <h3>Tạo kịch bản thành công!</h3>
-                <p>Đã tạo {num_scripts} kịch bản từ {num_articles} bài báo.</p>
-                <span>Đã tạo xong kịch bản, nhấn tab Kết quả ở trên để xem nội dung.</span>
+                <h3>Tạo kịch bản thành công</h3>
+                <p>Đã tạo <strong>{num_scripts} kịch bản</strong> từ {num_articles} bài báo.</p>
+                <span>Chuyển sang tab <strong>Kết quả</strong> để xem và tải xuống.</span>
             </div>
         </div>
         """,
@@ -427,40 +512,3 @@ def show_warning_message(warning_msg):
         f'<div class="warning-box status-box"><strong>Lưu ý:</strong> {warning_msg}</div>',
         unsafe_allow_html=True,
     )
-
-
-def render_supported_sources():
-    """Hiển thị danh sách các nguồn báo được hỗ trợ."""
-    sources_list = [
-        ("Quân Đội Nhân Dân", "qdnd.vn"),
-        ("VTV Tin tức", "vtv.vn"),
-        ("Nhân Dân", "nhandan.vn"),
-        ("Tuổi Trẻ Online", "tuoitre.vn"),
-        ("VnExpress", "vnexpress.net"),
-        ("Dân trí", "dantri.com.vn"),
-        ("Thanh Niên", "thanhnien.vn"),
-        ("Lao Động", "laodong.vn"),
-        ("Người Lao Động", "nld.com.vn"),
-        ("Công an Nhân dân", "cand.com.vn"),
-        ("Báo Pháp luật Việt Nam", "baophapluat.vn"),
-    ]
-
-    _render_section_header(
-        "🌐",
-        "Các trang báo được hỗ trợ",
-        "Hệ thống tự động crawl nội dung từ nhiều nguồn báo điện tử phổ biến tại Việt Nam.",
-        "Sources",
-    )
-
-    cols = st.columns(4)
-    for idx, (name, domain) in enumerate(sources_list):
-        with cols[idx % 4]:
-            st.markdown(
-                f"""
-                <div class="source-chip">
-                    <div class="source-chip__name">{name}</div>
-                    <div class="source-chip__domain">{domain}</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )

@@ -10,6 +10,20 @@ from .models.news_article import NewsArticle
 class NewsAgentProcessingMixin:
     """Mixin chứa phần xử lý dữ liệu của agent."""
 
+    def _emit_progress(self, percent: int, status: str, **payload: Any) -> None:
+        """Đẩy tiến trình hiện tại ra callback nếu UI có đăng ký."""
+        callback = getattr(self, "progress_callback", None)
+        if not callback:
+            return
+
+        callback(
+            {
+                "percent": max(0, min(100, int(percent))),
+                "status": status,
+                **payload,
+            }
+        )
+
     def understand_request(self, user_input: Dict[str, Any]) -> Dict[str, Any]:
         """Phân tích yêu cầu người dùng và lập kế hoạch xử lý."""
         try:
@@ -63,6 +77,37 @@ class NewsAgentProcessingMixin:
         try:
             params = plan["parameters"]
             urls = params["urls"]
+            total_units = max(1, int(plan.get("estimated_time") or 1))
+            extract_units = len(urls) * 8
+            combine_units = 4
+            generate_units = params["num_scripts"] * 15
+            base_after_extract = extract_units
+            base_after_combine = base_after_extract + combine_units
+            base_after_generate = base_after_combine + generate_units
+
+            def emit_progress_from_units(
+                completed_units: int,
+                status: str,
+                stage: str,
+                **extra: Any,
+            ) -> None:
+                percent = round((completed_units / total_units) * 100)
+                if completed_units < total_units:
+                    percent = min(percent, 99)
+                self._emit_progress(
+                    percent,
+                    status,
+                    stage=stage,
+                    completed_units=completed_units,
+                    total_units=total_units,
+                    **extra,
+                )
+
+            emit_progress_from_units(
+                0,
+                "Bắt đầu xử lý yêu cầu tạo kịch bản...",
+                "start",
+            )
 
             self.logger.info(f"Bước 1: Trích xuất {len(urls)} bài báo...")
             articles = []
@@ -76,7 +121,29 @@ class NewsAgentProcessingMixin:
                     self.logger.warning(f"  Lỗi bài báo {i}: Không thể trích xuất")
                     results["errors"].append(f"Không thể trích xuất bài báo từ URL {i}")
 
+                completed_extract_units = round((i / len(urls)) * extract_units)
+                article_status = (
+                    f"Đã trích xuất {len(articles)}/{len(urls)} bài báo hợp lệ."
+                    if article
+                    else f"URL {i}/{len(urls)} không trích xuất được, đang tiếp tục..."
+                )
+                emit_progress_from_units(
+                    completed_extract_units,
+                    article_status,
+                    "extract_articles",
+                    current_item=i,
+                    total_items=len(urls),
+                    successful_articles=len(articles),
+                )
+
             if not articles:
+                emit_progress_from_units(
+                    base_after_extract,
+                    "Không trích xuất được bài báo nào từ danh sách URL.",
+                    "extract_articles",
+                    successful_articles=0,
+                    total_items=len(urls),
+                )
                 return {
                     "success": False,
                     "error": "Không thể trích xuất bất kỳ bài báo nào",
@@ -94,17 +161,45 @@ class NewsAgentProcessingMixin:
             combined_content = self._combine_articles_content(articles)
             results["combined_content"] = combined_content
             results["steps_completed"].append("combine_content")
+            emit_progress_from_units(
+                base_after_combine,
+                f"Đã tổng hợp nội dung từ {len(articles)} bài báo, bắt đầu sinh kịch bản...",
+                "combine_content",
+                successful_articles=len(articles),
+            )
 
             self.logger.info("Bước 3: Tạo kịch bản tổng hợp...")
+
+            def generation_progress_callback(payload: Dict[str, Any]) -> None:
+                generation_completed_units = min(
+                    generate_units,
+                    max(0, int(payload.get("completed_units", 0))),
+                )
+                emit_progress_from_units(
+                    base_after_combine + generation_completed_units,
+                    payload.get("status", "Đang tạo kịch bản..."),
+                    "generate_scripts",
+                    current_script=payload.get("current_script"),
+                    total_scripts=payload.get("total_scripts", params["num_scripts"]),
+                    section=payload.get("section"),
+                )
+
             scripts = self._generate_scripts_from_combined_content(
                 combined_content,
                 articles,
                 params["user_prompt"],
                 params["target_length"],
                 params["num_scripts"],
+                progress_callback=generation_progress_callback,
             )
 
             if not scripts:
+                emit_progress_from_units(
+                    base_after_generate,
+                    "Không thể tạo được kịch bản từ phần nội dung đã tổng hợp.",
+                    "generate_scripts",
+                    total_scripts=params["num_scripts"],
+                )
                 return {
                     "success": False,
                     "error": "Không thể tạo kịch bản từ nội dung tổng hợp",
@@ -117,11 +212,25 @@ class NewsAgentProcessingMixin:
 
             results["scripts"] = scripts
             results["steps_completed"].append("generate_scripts")
+            emit_progress_from_units(
+                base_after_generate,
+                f"Đã tạo xong {len(scripts)} kịch bản, đang chuẩn bị kết quả hiển thị...",
+                "generate_scripts",
+                total_scripts=params["num_scripts"],
+                completed_scripts=len(scripts),
+            )
 
             self.logger.info("Bước 4: Chuẩn bị kết quả...")
             metadata = self._prepare_combined_metadata(articles, scripts, params)
             results["metadata"] = metadata
             results["steps_completed"].append("prepare_outputs")
+            emit_progress_from_units(
+                total_units,
+                "Hoàn tất tạo kịch bản. Kết quả đã sẵn sàng.",
+                "prepare_outputs",
+                completed_scripts=len(scripts),
+                total_scripts=params["num_scripts"],
+            )
 
             self.current_article = None
             self.current_scripts = scripts
@@ -140,6 +249,7 @@ class NewsAgentProcessingMixin:
             return results
         except Exception as exc:
             self.logger.error(f"Lỗi thực hiện kế hoạch nhiều URLs: {exc}")
+            self._emit_progress(100, f"Lỗi xử lý: {exc}", stage="error")
             return {
                 "success": False,
                 "error": str(exc),
@@ -188,6 +298,7 @@ class NewsAgentProcessingMixin:
         user_prompt: str,
         target_length: str,
         num_scripts: int,
+        progress_callback=None,
     ) -> List[str]:
         """Tạo kịch bản từ nội dung tổng hợp."""
         if not self.script_generator:
@@ -206,11 +317,14 @@ class NewsAgentProcessingMixin:
         combined_prompt = self.prompt_builder.create_combined_prompt(user_prompt, len(articles))
         
         # Lấy danh sách URLs từ các bài báo
+        articles_urls = [article.url for article in articles if article.url]
         return self.script_generator.generate_multiple_scripts(
             combined_article,
             combined_prompt,
             target_length,
             num_scripts,
+            articles_urls=articles_urls,
+            progress_callback=progress_callback,
         )
 
     def _prepare_combined_metadata(

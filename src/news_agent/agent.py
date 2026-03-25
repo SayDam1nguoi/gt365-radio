@@ -1,8 +1,8 @@
 """
-News agent chinh: dieu phoi va quan ly trang thai.
+News agent chính: điều phối và quản lý trạng thái.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 import logging
 
 from .backend import NewsProcessorBackend, ScriptGeneratorBackend
@@ -12,12 +12,12 @@ from ..models.news_article import NewsArticle
 
 
 class NewsScriptPromptBuilder:
-    """Xay dung prompt cho agent."""
+    """Xây dựng prompt cho agent."""
 
     STYLES = [
-        "trang trong va chuyen nghiep",
-        "than thien va gan gui",
-        "nang dong va hap dan",
+        "trang trọng và chuyên nghiệp",
+        "thân thiện và gần gũi",
+        "năng động và hấp dẫn",
     ]
 
     @staticmethod
@@ -25,10 +25,10 @@ class NewsScriptPromptBuilder:
         return (min_words + max_words) // 2
 
     def create_combined_prompt(self, user_prompt: str, article_count: int) -> str:
-        default_prompt = "Viet mot kich ban mach lac, de doc thanh loi, co phan tich ro rang."
+        default_prompt = "Viết một kịch bản mạch lạc, dễ đọc thành lời, có phân tích rõ ràng."
         return (
-            f"Tao kich ban tong hop tu {article_count} bai bao. "
-            f"Ket hop thong tin thanh mot mach ke chuyen thong nhat. "
+            f"Tạo kịch bản tổng hợp từ {article_count} bài báo. "
+            f"Kết hợp thông tin thành một mạch kể chuyện thống nhất. "
             f"{user_prompt.strip() if user_prompt and user_prompt.strip() else default_prompt}"
         )
 
@@ -37,8 +37,8 @@ class NewsScriptPromptBuilder:
     ) -> str:
         base_prompt = user_prompt.strip() if user_prompt and user_prompt.strip() else ""
         return (
-            f"Kich ban so {script_number}/{total_scripts}. "
-            f"Phong cach uu tien: {style}. "
+            f"Kịch bản số {script_number}/{total_scripts}. "
+            f"Phong cách ưu tiên: {style}. "
             f"{base_prompt}".strip()
         )
 
@@ -46,26 +46,27 @@ class NewsScriptPromptBuilder:
         self, target_length: str, style: str, min_words: int, max_words: int
     ) -> str:
         target_words = self._target_word_count(min_words, max_words)
-        return f"""Ban la bien tap vien viet kich ban tin tuc tieng Viet cho radio/podcast.
+        return f"""Bạn là biên tập viên viết kịch bản tin tức tiếng Việt cho radio/podcast.
 
-Muc tieu thoi luong: {target_length}.
-Muc tieu so tu: uu tien gan {target_words} tu nhat co the. Bat buoc nam trong {min_words}-{max_words} tu.
+Mục tiêu thời lượng: {target_length}.
+Mục tiêu số từ: ưu tiên gần {target_words} từ nhất có thể. Bắt buộc nằm trong {min_words}-{max_words} từ.
 
-Quy tac bat buoc:
-- Bam sat du kien tu bai nguon, khong them chi tiet khong co can cu.
-- Viet thanh kich ban hoan chinh, mach lac, de doc thanh loi.
-- Giu phong cach: {style}.
-- Khong dung markdown dam, khong bullet list trong phan kich ban.
-- Heading phai o dang van ban thuong:
-Mo dau:
-Noi dung chinh:
-Ket luan:
-- Uu tien dung muc tieu so tu hon viec viet ngan.
+Quy tắc bắt buộc:
+- Luôn viết bằng tiếng Việt có dấu đầy đủ, tự nhiên và đúng chính tả.
+- Bám sát dữ kiện từ bài nguồn, không thêm chi tiết không có căn cứ.
+- Viết thành kịch bản hoàn chỉnh, mạch lạc, dễ đọc thành lời.
+- Giữ phong cách: {style}.
+- Không dùng markdown đậm, không dùng bullet list trong phần kịch bản.
+- Heading phải ở dạng văn bản thường:
+Mở đầu:
+Nội dung chính:
+Kết luận:
+- Ưu tiên đúng mục tiêu số từ hơn việc viết ngắn cho xong.
 
-Cach trien khai:
-- Mo dau tao hook nhanh va dat boi canh.
-- Noi dung chinh la phan dai nhat, can dien giai du su kien, nguyen nhan, tac dong, y nghia.
-- Ket luan chot thong diep, gon nhung khong cut y.
+Cách triển khai:
+- Mở đầu tạo hook nhanh và đặt bối cảnh.
+- Nội dung chính là phần dài nhất, cần diễn giải đủ sự kiện, nguyên nhân, tác động và ý nghĩa.
+- Kết luận chốt thông điệp, gọn nhưng không cụt ý.
 """
 
     def create_script_user_prompt(
@@ -79,25 +80,28 @@ Cach trien khai:
         target_words = self._target_word_count(min_words, max_words)
         content = ContentCleanerTool.truncate_content(article.content, 3000)
         instruction = user_prompt.strip() if user_prompt and user_prompt.strip() else (
-            "Viet tu nhien, ro y, de doc thanh loi va co chieu sau phan tich."
+            "Viết tự nhiên, rõ ý, dễ đọc thành lời và có chiều sâu phân tích."
         )
 
-        return f"""Yeu cau cua nguoi dung:
+        return f"""Yêu cầu của người dùng:
 {instruction}
 
-Muc tieu thoi luong: {target_length}
-Muc tieu so tu: khoang {target_words} tu, bat buoc trong {min_words}-{max_words} tu.
-Uu tien tuan thu so tu va thoi luong. Khong viet qua ngan.
+Mục tiêu thời lượng: {target_length}
+Mục tiêu số từ: khoảng {target_words} từ, bắt buộc trong {min_words}-{max_words} từ.
+Ưu tiên tuân thủ số từ và thời lượng. Không viết quá ngắn.
 
-Doi tuong nguoi nghe:
-- Do tuoi: 25-60
-- Quan tam: chinh sach, xa hoi, kinh te va tac dong toi cuoc song
-- Ky vong: hieu van de ro hon sau khi nghe
+Đối tượng người nghe:
+- Độ tuổi: 25-60
+- Quan tâm: chính sách, xã hội, kinh tế và tác động tới cuộc sống
+- Kỳ vọng: hiểu vấn đề rõ hơn sau khi nghe
 
-Thong tin bai bao:
-Tieu de: {article.title}
-Nguon: {article.source.upper()}
-Noi dung nguon:
+Yêu cầu ngôn ngữ:
+- Bắt buộc dùng tiếng Việt có dấu đầy đủ ở toàn bộ kịch bản.
+
+Thông tin bài báo:
+Tiêu đề: {article.title}
+Nguồn: {article.source.upper()}
+Nội dung nguồn:
 {content}
 """
 
@@ -110,45 +114,45 @@ Noi dung nguon:
         style: str,
     ) -> Dict[str, str]:
         heading = {
-            "intro": "Mo dau:",
-            "main": "Noi dung chinh:",
-            "outro": "Ket luan:",
+            "intro": "Mở đầu:",
+            "main": "Nội dung chính:",
+            "outro": "Kết luận:",
         }.get(section_type, "")
         min_section_words = max(80, int(target_words * 0.9))
         max_section_words = int(target_words * 1.1)
 
         system_prompts = {
             "intro": (
-                f"Viet rieng phan mo dau. Heading phai la '{heading}'. "
-                f"Muc tieu {target_words} tu, chap nhan {min_section_words}-{max_section_words} tu. "
-                f"Can co hook, boi canh va dan vao chu de. Phong cach: {style}. "
-                "Khong markdown, khong bullet."
+                f"Viết riêng phần mở đầu. Heading phải là '{heading}'. "
+                f"Mục tiêu {target_words} từ, chấp nhận {min_section_words}-{max_section_words} từ. "
+                f"Cần có hook, bối cảnh và dẫn vào chủ đề. Phong cách: {style}. "
+                "Bắt buộc viết bằng tiếng Việt có dấu. Không markdown, không bullet."
             ),
             "main": (
-                f"Viet rieng phan noi dung chinh. Heading phai la '{heading}'. "
-                f"Muc tieu {target_words} tu, chap nhan {min_section_words}-{max_section_words} tu. "
-                "Day la phan dai nhat, phai khai thac du du kien, nguyen nhan, tac dong, dien giai va ket noi y. "
-                f"Phong cach: {style}. Khong markdown, khong bullet."
+                f"Viết riêng phần nội dung chính. Heading phải là '{heading}'. "
+                f"Mục tiêu {target_words} từ, chấp nhận {min_section_words}-{max_section_words} từ. "
+                "Đây là phần dài nhất, phải khai thác đủ dữ kiện, nguyên nhân, tác động, diễn giải và kết nối ý. "
+                f"Phong cách: {style}. Bắt buộc viết bằng tiếng Việt có dấu. Không markdown, không bullet."
             ),
             "outro": (
-                f"Viet rieng phan ket luan. Heading phai la '{heading}'. "
-                f"Muc tieu {target_words} tu, chap nhan {min_section_words}-{max_section_words} tu. "
-                "Chot thong diep gon, ro va khong cut y. "
-                f"Phong cach: {style}. Khong markdown, khong bullet."
+                f"Viết riêng phần kết luận. Heading phải là '{heading}'. "
+                f"Mục tiêu {target_words} từ, chấp nhận {min_section_words}-{max_section_words} từ. "
+                "Chốt thông điệp gọn, rõ và không cụt ý. "
+                f"Phong cách: {style}. Bắt buộc viết bằng tiếng Việt có dấu. Không markdown, không bullet."
             ),
         }
 
         return {
             "system_prompt": system_prompts.get(section_type, ""),
-            "user_prompt": f"""Dua tren thong tin sau de viet phan {section_type}.
+            "user_prompt": f"""Dựa trên thông tin sau để viết phần {section_type}.
 
-Yeu cau nguoi dung: {user_prompt}
+Yêu cầu người dùng: {user_prompt}
 
-Tieu de bai bao: {article.title}
-Noi dung bai bao:
+Tiêu đề bài báo: {article.title}
+Nội dung bài báo:
 {ContentCleanerTool.truncate_content(article.content, 2200)}
 
-Hay viet phan {section_type} gan {target_words} tu nhat co the, khong duoc thap hon {min_section_words} tu.""",
+Hãy viết phần {section_type} gần {target_words} từ nhất có thể, không được thấp hơn {min_section_words} từ và phải dùng tiếng Việt có dấu.""",
         }
 
     def create_section_retry_prompt(
@@ -156,25 +160,26 @@ Hay viet phan {section_type} gan {target_words} tu nhat co the, khong duoc thap 
     ) -> str:
         min_section_words = max(80, int(target_words * 0.9))
         max_section_words = int(target_words * 1.1)
-        return f"""Phan {section_type} truoc do co {actual_words} tu nen chua dat muc tieu.
-Hay viet lai gan {target_words} tu nhat co the, bat buoc nam trong {min_section_words}-{max_section_words} tu.
+        return f"""Phần {section_type} trước đó có {actual_words} từ nên chưa đạt mục tiêu.
+Hãy viết lại gần {target_words} từ nhất có thể, bắt buộc nằm trong {min_section_words}-{max_section_words} từ.
 
 {user_content}
 
-Tang do chi tiet, them chuyen y va dien giai de dat dung do dai."""
+Tăng độ chi tiết, thêm chuyển ý và diễn giải để đạt đúng độ dài. Bắt buộc giữ tiếng Việt có dấu."""
 
     def create_outline_request(
         self, article: NewsArticle, user_prompt: str, target_length: str, min_words: int
     ) -> Dict[str, str]:
         return {
             "system_prompt": (
-                f"Tao outline cho kich ban {target_length}, toi thieu {min_words} tu. "
-                "Outline phai chia ro mo dau, noi dung chinh, ket luan va du y de mo rong noi dung."
+                f"Tạo outline cho kịch bản {target_length}, tối thiểu {min_words} từ. "
+                "Outline phải chia rõ mở đầu, nội dung chính, kết luận và đủ ý để mở rộng nội dung. "
+                "Bắt buộc dùng tiếng Việt có dấu."
             ),
-            "user_prompt": f"""Yeu cau: {user_prompt}
+            "user_prompt": f"""Yêu cầu: {user_prompt}
 
-Tieu de: {article.title}
-Noi dung:
+Tiêu đề: {article.title}
+Nội dung:
 {ContentCleanerTool.truncate_content(article.content, 2000)}""",
         }
 
@@ -183,16 +188,16 @@ Noi dung:
     ) -> Dict[str, str]:
         return {
             "system_prompt": (
-                f"Viet kich ban day du theo outline, giu phong cach {style}. "
-                "Khong markdown dam. Giu heading dang van ban thuong."
+                f"Viết kịch bản đầy đủ theo outline, giữ phong cách {style}. "
+                "Không markdown đậm. Giữ heading dạng văn bản thường. Bắt buộc dùng tiếng Việt có dấu."
             ),
             "user_prompt": f"""Outline:
 {outline}
 
-Yeu cau goc:
+Yêu cầu gốc:
 {user_prompt}
 
-Noi dung bai bao:
+Nội dung bài báo:
 {ContentCleanerTool.truncate_content(article.content, 2500)}""",
         }
 
@@ -201,16 +206,17 @@ Noi dung bai bao:
     ) -> Dict[str, str]:
         return {
             "system_prompt": (
-                f"Mo rong kich ban hien tai them khoang {words_needed} tu. "
-                "Giu nguyen cau truc, khong lap y, bo sung bang phan tich va chuyen y tu nhien."
+                f"Mở rộng kịch bản hiện tại thêm khoảng {words_needed} từ. "
+                "Giữ nguyên cấu trúc, không lặp ý, bổ sung bằng phân tích và chuyển ý tự nhiên. "
+                "Bắt buộc dùng tiếng Việt có dấu."
             ),
-            "user_prompt": f"""Kich ban hien tai:
+            "user_prompt": f"""Kịch bản hiện tại:
 {current_script}
 
-Yeu cau goc:
+Yêu cầu gốc:
 {user_prompt}
 
-Thong tin bo sung:
+Thông tin bổ sung:
 {ContentCleanerTool.truncate_content(article.content, 1500)}""",
         }
 
@@ -218,16 +224,16 @@ Thong tin bo sung:
         self, user_content: str, word_count: int, min_words: int, max_words: int
     ) -> str:
         target_words = self._target_word_count(min_words, max_words)
-        return f"""Kich ban truoc chi co {word_count} tu nen chua dat yeu cau.
-Hay viet lai voi muc tieu khoang {target_words} tu, bat buoc trong {min_words}-{max_words} tu.
+        return f"""Kịch bản trước chỉ có {word_count} từ nên chưa đạt yêu cầu.
+Hãy viết lại với mục tiêu khoảng {target_words} từ, bắt buộc trong {min_words}-{max_words} từ.
 
 {user_content}
 
-Them dien giai, tac dong va chuyen y de dat dung thoi luong."""
+Thêm diễn giải, tác động và chuyển ý để đạt đúng thời lượng. Bắt buộc dùng tiếng Việt có dấu."""
 
 
 class NewsScriptAgent(NewsAgentProcessingMixin):
-    """News agent tao kich ban tu tin tuc."""
+    """News agent tạo kịch bản từ tin tức."""
 
     def __init__(self, ai_model: str = "gpt-3.5-turbo", api_key: str = None):
         self.ai_model = ai_model
@@ -245,14 +251,15 @@ class NewsScriptAgent(NewsAgentProcessingMixin):
         self.current_scripts: List[str] = []
         self.current_combined_metadata: Optional[Dict[str, Any]] = None
         self.processing_history: List[Dict[str, Any]] = []
+        self.progress_callback: Optional[Callable[[Dict[str, Any]], None]] = None
 
     def create_document(self, script: str, script_number: int = 1) -> bytes:
-        """Tao document Word cho kich ban."""
+        """Tạo document Word cho kịch bản."""
         if self.current_combined_metadata:
             article_info = {
                 "title": (
-                    f"Tong hop tu "
-                    f"{self.current_combined_metadata['combined_info']['total_articles']} bai bao"
+                    f"Tổng hợp từ "
+                    f"{self.current_combined_metadata['combined_info']['total_articles']} bài báo"
                 ),
                 "url": f"{self.current_combined_metadata['combined_info']['total_articles']} URLs",
                 "source": ", ".join(self.current_combined_metadata["combined_info"]["sources"]),
@@ -266,16 +273,16 @@ class NewsScriptAgent(NewsAgentProcessingMixin):
                 "word_count": self.current_article.get_word_count(),
             }
         else:
-            raise ValueError("Khong co bai bao hien tai de tao document")
+            raise ValueError("Không có bài báo hiện tại để tạo document")
 
         return self.news_processor.create_document_for_script(script, article_info, script_number)
 
     def get_script_statistics(self, script: str) -> Dict[str, Any]:
-        """Lay thong ke cho kich ban."""
+        """Lấy thống kê cho kịch bản."""
         return self.news_processor.get_script_statistics(script)
 
     def get_agent_status(self) -> Dict[str, Any]:
-        """Lay trang thai hien tai cua agent."""
+        """Lấy trạng thái hiện tại của agent."""
         return {
             "ai_model": self.ai_model,
             "has_api_key": bool(self.api_key),
@@ -292,3 +299,7 @@ class NewsScriptAgent(NewsAgentProcessingMixin):
             "processing_history_count": len(self.processing_history),
             "last_processing": self.processing_history[-1] if self.processing_history else None,
         }
+
+    def set_progress_callback(self, callback: Optional[Callable[[Dict[str, Any]], None]]) -> None:
+        """Gắn callback để đẩy tiến trình xử lý ra UI."""
+        self.progress_callback = callback
