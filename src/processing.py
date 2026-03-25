@@ -204,6 +204,8 @@ class NewsAgentProcessingMixin:
             ),
         )
         combined_prompt = self.prompt_builder.create_combined_prompt(user_prompt, len(articles))
+        
+        # Lấy danh sách URLs từ các bài báo
         return self.script_generator.generate_multiple_scripts(
             combined_article,
             combined_prompt,

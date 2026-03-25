@@ -1,102 +1,29 @@
-# 📰 News Script Generator - Universal News Agent
+# GT365 Radio - News Script Generator
 
-Hệ thống News Agent thông minh có thể crawl từ **bất kỳ trang báo nào** và tạo kịch bản theo **prompt tùy chỉnh** của người dùng.
+Ứng dụng web tạo kịch bản phát thanh từ tin tức các trang báo.
 
-## 🌟 Tính năng nổi bật
+## Tính năng
 
-### 🌐 **Universal News Crawler**
-- **Không giới hạn nguồn**: Crawl từ mọi trang báo Việt Nam
-- **Tự động nhận diện**: Tự động detect và xử lý các trang khác nhau
-- **Chiến lược đa dạng**: Sử dụng nhiều phương pháp trích xuất nội dung
-- **Hỗ trợ rộng rãi**: VnExpress, Tuổi Trẻ, Thanh Niên, Dân Trí, VietnamNet, Báo Mới, VTV, QĐND, Nhân Dân, và nhiều nguồn khác
+- Crawl tin tức từ các trang báo Việt Nam
+- Tạo kịch bản phát thanh bằng AI
+- Xuất file Word, JSON
+- Hỗ trợ tùy chỉnh độ dài và phong cách
 
-### 💭 **Prompt-Driven Generation**
-- **Tính năng chính**: Agent thực hiện chính xác theo prompt người dùng
-- **Linh hoạt tuyệt đối**: Tạo mọi loại kịch bản theo yêu cầu
-- **Sáng tạo không giới hạn**: YouTube, TikTok, Podcast, Radio, Thuyết trình
-- **Thích ứng thông minh**: Tự động điều chỉnh phong cách và định dạng
-
-## 🎯 Ví dụ Prompt sáng tạo
-
-### 📱 **Social Media Scripts**
-```
-Tạo kịch bản TikTok 60 giây về tin tức này:
-- Giọng điệu Gen Z, có emoji 
-- Hook đầu hấp dẫn trong 3 giây đầu
-- 3 điểm chính ngắn gọn
-- Kết thúc với call-to-action "Follow để cập nhật tin tức!"
-```
-
-### 🎙️ **Podcast Scripts**
-```
-Viết script podcast 15 phút phong cách Joe Rogan:
-- Mở đầu casual, thân thiện
-- Đi sâu vào phân tích, có góc nhìn cá nhân
-- Đặt câu hỏi mở để khán giả suy nghĩ
-- Kết nối với trải nghiệm đời thường
-```
-
-### 📺 **YouTube Scripts**
-```
-Tạo kịch bản YouTube 8 phút kiểu "explained":
-- Intro hook trong 15 giây đầu
-- Chia thành 3 phần rõ ràng với timestamp
-- Có graphics cues và B-roll suggestions
-- Kết thúc với teaser video tiếp theo
-```
-
-### 🎤 **Presentation Scripts**
-```
-Viết bài thuyết trình 10 phút cho hội nghị khoa học:
-- Cấu trúc academic với introduction, body, conclusion
-- Có slide cues và data visualization notes
-- Ngôn ngữ formal, chuyên nghiệp
-- Q&A preparation ở cuối
-```
-
-## ✨ Tính năng chính
-
-### 🔗 Crawl tin tức
-- Hỗ trợ các trang báo: **Nhân Dân**, **VTV**, **QĐND**
-- Tự động trích xuất tiêu đề và nội dung
-- Làm sạch dữ liệu, loại bỏ quảng cáo
-
-### 🤖 Tạo kịch bản AI
-- Hỗ trợ nhiều model: **GPT-3.5**, **GPT-4**, **Claude-3**
-- Tùy chỉnh độ dài: 1-30 phút
-- Tạo tối đa 3 kịch bản với phong cách khác nhau
-- Prompt tùy chỉnh theo ý muốn
-
-### 💾 Xuất file
-- **Word (.docx)**: Định dạng chuyên nghiệp
-- **JSON**: Dữ liệu có cấu trúc
-- Thống kê chi tiết: số từ, thời lượng ước tính
-
-## 🚀 Cài đặt và chạy
+## Cài đặt
 
 ```bash
-# Cài đặt dependencies
 pip install -r requirements_app.txt
-
-# Chạy ứng dụng
 streamlit run app.py
 ```
 
-Ứng dụng sẽ mở tại: `http://localhost:8501`
+Mở tại: `http://localhost:8501`
 
-## 🔧 Cấu hình
+## Cấu hình
 
-### API Keys
-Tạo file `.env` trong thư mục gốc với nội dung:
-
+Tạo file `.env` với:
 ```
-OPENAI_API_KEY=your_openai_key_here
+OPENAI_API_KEY=your_key_here
 ```
-
-Bạn cần API key từ một trong các nhà cung cấp:
-
-- **OpenAI**: https://platform.openai.com/api-keys
-- **Anthropic**: https://console.anthropic.com/
 
 ### Cấu trúc dự án
 ```

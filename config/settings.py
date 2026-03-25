@@ -57,6 +57,150 @@ NEWS_SOURCES = {
             'time': '.time-post, .publish-time, .article-time',
             'summary': '.sapo-detail, .article-summary, .article-sapo'
         }
+    },
+    'tuoitre': {
+        'base_url': 'https://tuoitre.vn',
+        'categories': [
+            'https://tuoitre.vn/chinh-tri.html',
+            'https://tuoitre.vn/phap-luat.html',
+            'https://tuoitre.vn/the-thao.html',
+            'https://tuoitre.vn/kinh-doanh.html',
+            'https://tuoitre.vn/giao-duc.html',
+            'https://tuoitre.vn/khoa-hoc-cong-nghe.html'
+        ],
+        'selectors': {
+            'article_links': 'h3 a[href*=".html"], .article-title a[href*=".html"]',
+            'title': 'h1.detail-title, h1.article-title, h1',
+            'content': 'div.detail-content > p, div.detail-content p', 
+            'time': '.detail-time, .article-time, .publish-time, time',
+            'summary': '.detail-summary, .article-summary, .sapo, h2.sapo'
+        }
+    },
+    'vnexpress': {
+        'base_url': 'https://vnexpress.net',
+        'categories': [
+            'https://vnexpress.net/thoi-su',
+            'https://vnexpress.net/phap-luat',
+            'https://vnexpress.net/kinh-doanh',
+            'https://vnexpress.net/giao-duc',
+            'https://vnexpress.net/khoa-hoc',
+            'https://vnexpress.net/the-gioi'
+        ],
+        'selectors': {
+            'article_links': 'h3 a[href*="/"], .title-news a[href*="/"]',
+            'title': 'h1.title-detail, h1.article-title, h1',
+            'content': '.article-content, #abodyContent, .story-content',
+            'time': 'span.publish-time, .date-time, time',
+            'summary': '.description, .article-summary, .sapo'
+        }
+    },
+    'dantri': {
+        'base_url': 'https://dantri.com.vn',
+        'categories': [
+            'https://dantri.com.vn/chinh-tri.htm',
+            'https://dantri.com.vn/phap-luat.htm',
+            'https://dantri.com.vn/kinh-doanh.htm',
+            'https://dantri.com.vn/giao-duc-khuon-vinh.htm',
+            'https://dantri.com.vn/doi-song.htm',
+            'https://dantri.com.vn/the-thao.htm'
+        ],
+        'selectors': {
+            'article_links': 'h3 a[href*=".htm"], .article-title a',
+            'title': 'h1.title-detail, .story-title h1, h1',
+            'content': '.singular-content p, .e-magazine__body p, .story-content p, article p',
+            'time': '.author-time, .time-post, .publish-time, .date-time, time',
+            'summary': '.singular-sapo, .story-desc, .article-summary, .sapo'
+        }
+    },
+    'thanhnien': {
+        'base_url': 'https://thanhnien.vn',
+        'categories': [
+            'https://thanhnien.vn/chinh-tri',
+            'https://thanhnien.vn/phap-luat',
+            'https://thanhnien.vn/kinh-te',
+            'https://thanhnien.vn/giao-duc',
+            'https://thanhnien.vn/cong-nghe',
+            'https://thanhnien.vn/the-thao'
+        ],
+        'selectors': {
+            'article_links': 'h3 a[href*="/"], .title-news a',
+            'title': 'h1.title-detail, .article-title h1, h1',
+            'content': '.detail__cmain p, .detail-content p, .article-content p, .story-body p',
+            'time': '.detail-time, .date-time, .publish-time, .time-post, time',
+            'summary': '.detail-sapo, .sapo, .article-summary, .description'
+        }
+    },
+    'laodong': {
+        'base_url': 'https://laodong.vn',
+        'categories': [
+            'https://laodong.vn/chinh-tri',
+            'https://laodong.vn/xa-hoi',
+            'https://laodong.vn/kinh-te',
+            'https://laodong.vn/giao-duc-khoa-hoc',
+            'https://laodong.vn/phap-luat',
+            'https://laodong.vn/the-thao'
+        ],
+        'selectors': {
+            'article_links': 'h3 a[href*="/"], h2 a[href*="/"]',
+            'title': 'h1.title-detail, .article-title h1, h1',
+            'content': 'article p, .article-content p, .detail-content p, .content-body p',
+            'time': '.time-post, .date-time, .publish-time, time',
+            'summary': '.sapo, .article-summary, .description'
+        }
+    },
+    'nld': {
+        'base_url': 'https://nld.com.vn',
+        'categories': [
+            'https://nld.com.vn/chinh-tri.htm',
+            'https://nld.com.vn/xa-hoi.htm',
+            'https://nld.com.vn/phap-luat.htm',
+            'https://nld.com.vn/kinh-te.htm',
+            'https://nld.com.vn/giao-duc.htm',
+            'https://nld.com.vn/khoa-hoc.htm'
+        ],
+        'selectors': {
+            'article_links': 'h3 a[href*=".html"], .article-title a',
+            'title': 'h1.title-detail, .article-title h1, h1',
+            'content': '.article-content, .detail-content, .story-body',
+            'time': '.date-time, .publish-time, .time-post',
+            'summary': '.sapo, .article-summary, .description'
+        }
+    },
+    'cand': {
+        'base_url': 'https://cand.com.vn',
+        'categories': [
+            'https://cand.com.vn/chinh-tri.htm',
+            'https://cand.com.vn/phap-luat.htm',
+            'https://cand.com.vn/xa-hoi.htm',
+            'https://cand.com.vn/kinh-te.htm',
+            'https://cand.com.vn/giao-duc.htm',
+            'https://cand.com.vn/the-thao.htm'
+        ],
+        'selectors': {
+            'article_links': 'h3 a[href*=".html"], .article-title a',
+            'title': 'h1.title-detail, .article-title h1, h1',
+            'content': '.article-content, .detail-content, .content-body',
+            'time': '.time-post, .date-time, .publish-time',
+            'summary': '.sapo, .article-summary, .description'
+        }
+    },
+    'baophapluat': {
+        'base_url': 'https://baophapluat.vn',
+        'categories': [
+            'https://baophapluat.vn/tin-phap-luat.html',
+            'https://baophapluat.vn/chinh-tri.html',
+            'https://baophapluat.vn/toa-an.html',
+            'https://baophapluat.vn/cong-an.html',
+            'https://baophapluat.vn/trong-nuoc.html',
+            'https://baophapluat.vn/quoc-te.html'
+        ],
+        'selectors': {
+            'article_links': 'h3 a[href*=".html"], .article-title a',
+            'title': 'h1.title-detail, .article-title h1, h1',
+            'content': '.article-content, .detail-content, .story-body',
+            'time': '.date-time, .publish-time, .time-post',
+            'summary': '.sapo, .article-summary, .description'
+        }
     }
 }
 

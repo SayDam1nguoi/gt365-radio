@@ -1,20 +1,21 @@
 """
-Backend cho News Agent - xử lý logic nghiệp vụ.
+Backend cho News Agent: crawl tin tức, tạo tài liệu và sinh kịch bản.
 """
+
 from typing import Any, Dict, List, Optional
 import logging
 import re
+import time
 
-from .tools import AIModelTool, ContentCleanerTool, DocumentTool, UniversalWebCrawlerTool
+from .tools import AIModelTool, DocumentTool, UniversalWebCrawlerTool
 from ..models.news_article import NewsArticle
 
 
 class NewsProcessorBackend:
-    """Backend xử lý tin tức."""
+    """Backend xử lý bài báo đầu vào."""
 
     def __init__(self):
         self.crawler_tool = UniversalWebCrawlerTool()
-        self.cleaner_tool = ContentCleanerTool()
         self.document_tool = DocumentTool()
         self.logger = logging.getLogger(__name__)
 
@@ -41,12 +42,11 @@ class NewsProcessorBackend:
             )
 
             if article.is_valid():
-                self.logger.info(f"Trích xuất thành công từ {article.source}: {article.title[:50]}...")
+                self.logger.info(f"Trích xuất thành công từ {article.source}: {article.title[:60]}...")
                 return article
 
             self.logger.warning(f"Bài báo không hợp lệ: {url}")
             return None
-
         except Exception as exc:
             self.logger.error(f"Lỗi trích xuất bài báo {url}: {exc}")
             return None
@@ -54,12 +54,11 @@ class NewsProcessorBackend:
     def create_document_for_script(
         self, script: str, article_info: Dict[str, Any], script_number: int = 1
     ) -> bytes:
-        """Tạo document Word cho kịch bản."""
+        """Tạo file Word cho kịch bản."""
         title = f"KỊCH BẢN {script_number}"
         metadata = {
-            "Tiêu đề bài gốc": article_info.get("title", "N/A"),
+            "Tiêu đề nguồn": article_info.get("title", "N/A"),
             "Nguồn": article_info.get("source", "N/A").upper(),
-            "URL": article_info.get("url", "N/A"),
             "Số từ bài gốc": article_info.get("word_count", "N/A"),
         }
         return self.document_tool.create_word_document(title, script, metadata)
@@ -70,7 +69,7 @@ class NewsProcessorBackend:
 
 
 class ScriptGeneratorBackend:
-    """Backend tạo kịch bản. Prompt được cung cấp từ Agent."""
+    """Backend sinh kịch bản. Prompt được xây dựng ở agent."""
 
     def __init__(self, model: str, api_key: str, prompt_builder):
         self.ai_tool = AIModelTool(model, api_key)
@@ -78,7 +77,7 @@ class ScriptGeneratorBackend:
         self.logger = logging.getLogger(__name__)
 
     def _calculate_target_words(self, target_length: str) -> tuple[int, int]:
-        """Tính số từ cần thiết theo thời lượng mục tiêu."""
+        """Tính khoảng số từ từ thời lượng mục tiêu."""
         words_per_minute = 160
         numbers = re.findall(r"\d+", target_length)
 
@@ -95,8 +94,12 @@ class ScriptGeneratorBackend:
 
         return min_words, max_words
 
+    @staticmethod
+    def _is_word_count_acceptable(word_count: int, min_words: int, max_words: int) -> bool:
+        return min_words <= word_count <= max_words
+
     def _normalize_script_format(self, script: str) -> str:
-        """Chuẩn hóa heading của kịch bản về dạng text thường."""
+        """Chuẩn hóa heading về dạng văn bản thường."""
         if not script:
             return script
 
@@ -104,16 +107,20 @@ class ScriptGeneratorBackend:
             "MỞ ĐẦU": "Mở đầu:",
             "NỘI DUNG CHÍNH": "Nội dung chính:",
             "KẾT LUẬN": "Kết luận:",
-            "OUTRO": "Kết luận:",
             "INTRO": "Mở đầu:",
+            "OUTRO": "Kết luận:",
         }
 
         for raw_heading, plain_heading in heading_map.items():
             pattern = rf"(?im)^\s*\*\*\s*{raw_heading}\s*:?\s*\*\*\s*$"
             script = re.sub(pattern, plain_heading, script)
 
-        script = re.sub(r"(?im)^\s*\*\*(Mở đầu|Nội dung chính|Kết luận)\s*:?\*\*\s*$", r"\1:", script)
-        return script
+        script = re.sub(
+            r"(?im)^\s*\*\*(Mở đầu|Nội dung chính|Kết luận)\s*:?\*\*\s*$",
+            r"\1:",
+            script,
+        )
+        return script.strip()
 
     def generate_script(
         self,
@@ -129,21 +136,11 @@ class ScriptGeneratorBackend:
 
             if min_words >= 800:
                 return self._generate_script_with_iterative_expansion(
-                    article,
-                    user_prompt,
-                    target_length,
-                    style,
-                    min_words,
-                    max_words,
+                    article, user_prompt, target_length, style, min_words, max_words
                 )
 
             return self._generate_short_script(
-                article,
-                user_prompt,
-                target_length,
-                style,
-                min_words,
-                max_words,
+                article, user_prompt, target_length, style, min_words, max_words
             )
         except Exception as exc:
             self.logger.error(f"Lỗi tạo kịch bản: {exc}")
@@ -158,26 +155,19 @@ class ScriptGeneratorBackend:
         min_words: int,
         max_words: int,
     ) -> Optional[str]:
-        """Tạo kịch bản dài bằng cách sinh từng phần."""
-        self.logger.info(f"Sử dụng chiến lược tạo từng phần cho kịch bản {target_length}")
+        """Sinh kịch bản dài theo từng phần."""
+        self.logger.info(f"Dùng chiến lược sinh từng phần cho kịch bản {target_length}")
 
         try:
-            intro_words = max(200, int(min_words * 0.15))
-            outro_words = max(200, int(min_words * 0.15))
-            main_content_words = min_words - intro_words - outro_words
+            intro_words = max(180, int(min_words * 0.15))
+            outro_words = max(160, int(min_words * 0.12))
+            main_words = max(min_words - intro_words - outro_words, int(min_words * 0.7))
 
             intro = self._generate_script_section("intro", intro_words, article, user_prompt, style)
-            if not intro:
-                return None
-
-            main_content = self._generate_script_section(
-                "main", main_content_words, article, user_prompt, style
-            )
-            if not main_content:
-                return None
-
+            main_content = self._generate_script_section("main", main_words, article, user_prompt, style)
             outro = self._generate_script_section("outro", outro_words, article, user_prompt, style)
-            if not outro:
+
+            if not intro or not main_content or not outro:
                 return None
 
             full_script = f"{intro}\n\n{main_content}\n\n{outro}"
@@ -198,13 +188,9 @@ class ScriptGeneratorBackend:
         user_prompt: str,
         style: str,
     ) -> Optional[str]:
-        """Tạo một phần cụ thể của kịch bản."""
+        """Sinh một phần riêng của kịch bản."""
         request = self.prompt_builder.create_section_request(
-            section_type,
-            target_words,
-            article,
-            user_prompt,
-            style,
+            section_type, target_words, article, user_prompt, style
         )
         system_prompt = request.get("system_prompt", "")
         user_content = request.get("user_prompt", "")
@@ -216,9 +202,7 @@ class ScriptGeneratorBackend:
             max_tokens = max(1500, max_tokens)
 
             section_content = self.ai_tool.generate_text(
-                system_prompt,
-                user_content,
-                max_tokens=max_tokens,
+                system_prompt, user_content, max_tokens=max_tokens
             )
             if not section_content:
                 return None
@@ -226,19 +210,21 @@ class ScriptGeneratorBackend:
             actual_words = len(section_content.split())
             self.logger.info(f"Tạo phần {section_type}: {actual_words} từ")
 
-            if actual_words < target_words * 0.7:
+            min_section_words = max(80, int(target_words * 0.9))
+            max_section_words = int(target_words * 1.1)
+
+            if actual_words < min_section_words or actual_words > max_section_words:
                 retry_content = self.ai_tool.generate_text(
                     system_prompt,
                     self.prompt_builder.create_section_retry_prompt(
-                        section_type,
-                        target_words,
-                        actual_words,
-                        user_content,
+                        section_type, target_words, actual_words, user_content
                     ),
                     max_tokens=max_tokens,
                 )
-                if retry_content and len(retry_content.split()) > actual_words:
-                    section_content = retry_content
+                if retry_content:
+                    retry_words = len(retry_content.split())
+                    if abs(retry_words - target_words) < abs(actual_words - target_words):
+                        section_content = retry_content
 
             return section_content
         except Exception as exc:
@@ -255,16 +241,11 @@ class ScriptGeneratorBackend:
     ) -> Optional[str]:
         """Tạo outline chi tiết cho kịch bản dài."""
         request = self.prompt_builder.create_outline_request(
-            article,
-            user_prompt,
-            target_length,
-            min_words,
+            article, user_prompt, target_length, min_words
         )
         try:
             return self.ai_tool.generate_text(
-                request["system_prompt"],
-                request["user_prompt"],
-                max_tokens=2000,
+                request["system_prompt"], request["user_prompt"], max_tokens=2000
             )
         except Exception as exc:
             self.logger.error(f"Lỗi tạo outline: {exc}")
@@ -277,18 +258,13 @@ class ScriptGeneratorBackend:
         outline: str,
         style: str,
     ) -> Optional[str]:
-        """Tạo kịch bản cơ bản từ outline."""
+        """Tạo bản nháp từ outline."""
         request = self.prompt_builder.create_base_script_request(
-            article,
-            user_prompt,
-            outline,
-            style,
+            article, user_prompt, outline, style
         )
         try:
             return self.ai_tool.generate_text(
-                request["system_prompt"],
-                request["user_prompt"],
-                max_tokens=4000,
+                request["system_prompt"], request["user_prompt"], max_tokens=4000
             )
         except Exception as exc:
             self.logger.error(f"Lỗi tạo kịch bản cơ bản: {exc}")
@@ -303,7 +279,7 @@ class ScriptGeneratorBackend:
         min_words: int,
         max_words: int,
     ) -> Optional[str]:
-        """Mở rộng kịch bản đến độ dài mục tiêu."""
+        """Mở rộng kịch bản tới số từ mục tiêu."""
         current_script = base_script
         current_words = len(current_script.split())
 
@@ -316,11 +292,7 @@ class ScriptGeneratorBackend:
                 break
 
             expanded_script = self._expand_script_content(
-                current_script,
-                article,
-                user_prompt,
-                style,
-                words_needed,
+                current_script, article, user_prompt, style, words_needed
             )
             if not expanded_script or len(expanded_script) <= len(current_script):
                 break
@@ -340,17 +312,12 @@ class ScriptGeneratorBackend:
     ) -> Optional[str]:
         """Mở rộng nội dung kịch bản."""
         request = self.prompt_builder.create_expand_script_request(
-            current_script,
-            article,
-            user_prompt,
-            words_needed,
+            current_script, article, user_prompt, words_needed
         )
         try:
             max_tokens = min(4000, (len(current_script.split()) + words_needed) * 2)
             return self.ai_tool.generate_text(
-                request["system_prompt"],
-                request["user_prompt"],
-                max_tokens=max_tokens,
+                request["system_prompt"], request["user_prompt"], max_tokens=max_tokens
             )
         except Exception as exc:
             self.logger.error(f"Lỗi mở rộng kịch bản: {exc}")
@@ -365,18 +332,17 @@ class ScriptGeneratorBackend:
         min_words: int,
         max_words: int,
     ) -> Optional[str]:
-        """Tạo kịch bản ngắn bằng một lần gọi AI."""
+        """Sinh kịch bản ngắn bằng một hoặc hai lần gọi AI."""
         try:
             estimated_tokens = int(max_words * 2.5) + 1000
             max_tokens = min(4000, max(2500, estimated_tokens))
 
             system_prompt = self.prompt_builder.create_script_system_prompt(
-                target_length,
-                style,
-                min_words,
-                max_words,
+                target_length, style, min_words, max_words
             )
-            user_content = self.prompt_builder.create_script_user_prompt(article, user_prompt)
+            user_content = self.prompt_builder.create_script_user_prompt(
+                article, user_prompt, target_length, min_words, max_words
+            )
 
             script = self.ai_tool.generate_text(system_prompt, user_content, max_tokens=max_tokens)
             if not script:
@@ -387,18 +353,21 @@ class ScriptGeneratorBackend:
                 f"Tạo kịch bản ngắn thành công: {word_count} từ (mục tiêu: {min_words}-{max_words} từ)"
             )
 
-            if word_count < min_words * 0.8:
+            if not self._is_word_count_acceptable(word_count, min_words, max_words):
                 retry_script = self.ai_tool.generate_text(
                     system_prompt,
                     self.prompt_builder.create_short_retry_prompt(
-                        user_content,
-                        word_count,
-                        min_words,
+                        user_content, word_count, min_words, max_words
                     ),
                     max_tokens=max_tokens,
                 )
-                if retry_script and len(retry_script.split()) > word_count:
-                    script = retry_script
+                if retry_script:
+                    retry_words = len(retry_script.split())
+                    target_words = (min_words + max_words) // 2
+                    if self._is_word_count_acceptable(retry_words, min_words, max_words):
+                        script = retry_script
+                    elif abs(retry_words - target_words) < abs(word_count - target_words):
+                        script = retry_script
 
             return self._normalize_script_format(script)
         except Exception as exc:
@@ -412,25 +381,20 @@ class ScriptGeneratorBackend:
         target_length: str = "3-5 phút",
         num_scripts: int = 1,
     ) -> List[str]:
-        """Tạo nhiều kịch bản với phong cách khác nhau."""
+        """Tạo nhiều phiên bản kịch bản với các phong cách khác nhau."""
         scripts: List[str] = []
 
         for i in range(num_scripts):
             try:
                 style = self.prompt_builder.STYLES[i % len(self.prompt_builder.STYLES)]
                 enhanced_prompt = self.prompt_builder.create_enhanced_prompt_for_script(
-                    user_prompt,
-                    style,
-                    i + 1,
-                    num_scripts,
+                    user_prompt, style, i + 1, num_scripts
                 )
                 script = self.generate_script(article, enhanced_prompt, target_length, style)
                 if script:
                     scripts.append(script)
 
                 if i < num_scripts - 1:
-                    import time
-
                     time.sleep(1)
             except Exception as exc:
                 self.logger.error(f"Lỗi tạo kịch bản {i + 1}: {exc}")

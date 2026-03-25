@@ -1,39 +1,47 @@
 """
-GT365 Radio News Script Generator - Backend Processing
+GT365 Radio News Script Generator - ứng dụng chính.
 """
+
 import os
 import sys
 
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from src.giaodien import *  # noqa: F403
+from giao_dien.giaodien import *  # noqa: F403
 from src.news_agent import NewsScriptAgent
 
 
 def main():
-    """Hàm chính - chỉ xử lý logic backend."""
+    """Điểm vào chính của ứng dụng."""
     setup_page_config()
     load_custom_css()
     render_header()
 
+    st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
+    render_supported_sources()
+    st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
+
     if "total_scripts" not in st.session_state:
         st.session_state.total_scripts = 0
 
-    tab1, tab2 = st.tabs(["📝 Tạo kịch bản", "📊 Kết quả"])
+    if "show_results_view" not in st.session_state:
+        st.session_state.show_results_view = False
 
-    with tab1:
+    tab_tao, tab_ket_qua = st.tabs(["Tạo kịch bản", "Kết quả"])
+
+    with tab_tao:
         handle_script_creation()
 
-    with tab2:
+    with tab_ket_qua:
         render_results_tab()
 
+
 def handle_script_creation():
-    """Xử lý tạo kịch bản."""
+    """Xử lý form tạo kịch bản."""
     api_key = os.getenv("OPENAI_API_KEY", "")
     ai_model = "gpt-3.5-turbo"
 
@@ -44,71 +52,48 @@ def handle_script_creation():
     user_prompt = render_prompt_section()
     script_length, custom_length, num_scripts = render_config_section()
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 0.6rem;'></div>", unsafe_allow_html=True)
 
-    if st.button("🚀 Tạo kịch bản chuyên nghiệp", type="primary", use_container_width=True):
+    if st.button("Tạo kịch bản chuyên nghiệp", type="primary", use_container_width=True):
         if not news_urls:
             show_error_message("Vui lòng nhập ít nhất một link bài báo hợp lệ.")
             return
 
         if not user_prompt.strip():
-            show_warning_message("Vui lòng nhập prompt để Agent hiểu yêu cầu của bạn.")
+            show_warning_message("Vui lòng nhập prompt để Agent hiểu rõ yêu cầu của bạn.")
             return
 
-        if script_length == "Tùy chỉnh" and custom_length:
-            final_length = f"{custom_length} phút"
-        else:
-            final_length = script_length
-
+        final_length = (
+            f"{custom_length} phút" if script_length == "Tùy chỉnh" and custom_length else script_length
+        )
         process_news_to_script(news_urls, user_prompt, final_length, num_scripts)
 
 
 def process_news_to_script(urls, prompt, length, num_scripts):
-    """Tạo kịch bản từ danh sách bài báo."""
+    """Tạo kịch bản từ danh sách URL."""
     agent = st.session_state.agent
-    progress_container = st.container()
 
-    with progress_container:
-        progress_bar, status_text = render_progress_bar(0, "🔍 Kiểm tra cấu hình Agent...")
+    try:
+        agent_status = agent.get_agent_status()
+        if not agent_status["has_api_key"]:
+            show_error_message("News Agent chưa có API key. Vui lòng cấu hình trong file `.env`.")
+            return
 
-        try:
-            progress_bar.progress(10)
+        success, results = agent.process_multiple_news_to_script(
+            urls=urls,
+            prompt=prompt,
+            length=length,
+            num_scripts=num_scripts,
+            source="universal",
+        )
 
-            agent_status = agent.get_agent_status()
-            if not agent_status["has_api_key"]:
-                show_error_message("News Agent chưa có API key. Vui lòng cấu hình trong file `.env`.")
-                return
-
-            status_text.text(f"📰 Đang crawl {len(urls)} bài báo...")
-            progress_bar.progress(30)
-
-            status_text.text("✍️ Đang tạo kịch bản với AI...")
-            progress_bar.progress(60)
-
-            success, results = agent.process_multiple_news_to_script(
-                urls=urls,
-                prompt=prompt,
-                length=length,
-                num_scripts=num_scripts,
-                source="universal",
-            )
-
-            progress_bar.progress(90)
-
-            if success:
-                save_results_to_session(results)
-                progress_bar.progress(100)
-                status_text.text("✅ Hoàn thành")
-
-                show_success_message(len(results["scripts"]), len(results.get("articles", [])))
-                st.info("👉 Chuyển sang tab `Kết quả` để xem các kịch bản đã tạo.")
-            else:
-                progress_bar.progress(0)
-                show_error_message(results.get("error", "Không xác định"))
-
-        except Exception as exc:
-            progress_bar.progress(0)
-            show_error_message(f"Lỗi hệ thống: {exc}")
+        if success:
+            save_results_to_session(results)
+            show_success_message(len(results["scripts"]), len(results.get("articles", [])))
+        else:
+            show_error_message(results.get("error", "Không xác định"))
+    except Exception as exc:
+        show_error_message(f"Lỗi hệ thống: {exc}")
 
 
 def save_results_to_session(results):
@@ -121,7 +106,6 @@ def save_results_to_session(results):
         combined_info = results["metadata"]["combined_info"]
         article_info = {
             "title": f"Tổng hợp từ {combined_info['total_articles']} bài báo",
-            "url": f"{combined_info['total_articles']} URLs",
             "source": ", ".join(combined_info["sources"]),
             "word_count": combined_info["total_word_count"],
         }
