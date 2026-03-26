@@ -145,20 +145,17 @@ Nội dung nguồn:
         system_prompts = {
             "intro": (
                 f"Viết riêng phần mở đầu. Heading phải là '{heading}'. "
-                f"Mục tiêu {target_words} từ, chấp nhận {min_section_words}-{max_section_words} từ. "
                 f"Cần có hook, bối cảnh và dẫn vào chủ đề. Phong cách: {style}. "
                 "Bắt buộc viết bằng tiếng Việt có dấu. Không markdown, không bullet."
             ),
             "main": (
                 f"Viết riêng phần nội dung chính. Heading phải là '{heading}'. "
-                f"Mục tiêu {target_words} từ, chấp nhận {min_section_words}-{max_section_words} từ. "
                 "Đây là phần dài nhất, phải khai thác đủ dữ kiện, nguyên nhân, tác động, diễn giải và kết nối ý. "
                 f"Phong cách: {style}. Bắt buộc viết bằng tiếng Việt có dấu. Không markdown, không bullet."
             ),
             "outro": (
                 f"Viết riêng phần kết luận. Heading phải là '{heading}'. "
-                f"Mục tiêu {target_words} từ, chấp nhận {min_section_words}-{max_section_words} từ. "
-                "Chốt thông điệp gọn, rõ và không cụt ý. "
+                "Chốt thông điệp rõ và không cụt ý. "
                 f"Phong cách: {style}. Bắt buộc viết bằng tiếng Việt có dấu. Không markdown, không bullet."
             ),
         }
@@ -173,7 +170,7 @@ Tiêu đề bài báo: {article.title}
 Nội dung bài báo:
 {ContentCleanerTool.truncate_content(article.content, 2200)}
 
-Hãy viết phần {section_type} gần {target_words} từ nhất có thể, không được thấp hơn {min_section_words} từ và phải dùng tiếng Việt có dấu.""",
+Hãy viết phần {section_type} đầy đủ và phải dùng tiếng Việt có dấu.""",
         }
 
     def create_section_retry_prompt(
