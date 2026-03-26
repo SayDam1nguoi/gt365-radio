@@ -130,6 +130,7 @@ def handle_script_creation():
 
     def on_generate_click():
         st.session_state.is_generating = True
+        st.session_state.result_navigation_ready = False
 
     is_generating = st.session_state.get("is_generating", False)
     generate_btn_container = st.empty()
