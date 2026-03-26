@@ -5,12 +5,12 @@ GT365 Radio News Script Generator - ứng dụng chính.
 import os
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from dotenv import load_dotenv
 import streamlit as st
 
 load_dotenv()
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from giao_dien.giaodien import *  # noqa: F403
 from src.news_agent import NewsScriptAgent
