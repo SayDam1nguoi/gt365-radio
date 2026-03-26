@@ -384,15 +384,26 @@ class TTSService:
                     self.ws = None
                     self.is_auth = False
 
+    @classmethod
+    def _clean_text_for_tts(cls, text: str) -> str:
+        """Loại bỏ các tiêu đề và phần tham khảo trước khi đọc TTS"""
+        text = re.split(r"(?mi)^\s*Nguồn tham khảo:", text)[0]
+        headings = [r"(?mi)^\s*Mở đầu\s*:?", r"(?mi)^\s*Nội dung chính\s*:?", r"(?mi)^\s*Kết luận\s*:?"]
+        for p in headings:
+            text = re.sub(p, "", text)
+        return text.strip()
+
     def generate_audio(self, text: str, output_path: str) -> bool:
         """
         Streamlit Sync Frontend Wrapper. 
         Calls async generator, bundles raw PCM into playable WAV file.
         """
+        clean_text = self._clean_text_for_tts(text)
+        
         async def _run():
             pcm_bytes = bytearray()
             try:
-                async for chunk in self.synthesize(text):
+                async for chunk in self.synthesize(clean_text):
                     if chunk:
                         pcm_bytes.extend(chunk)
             except Exception as e:
