@@ -15,9 +15,9 @@ class NewsScriptPromptBuilder:
     """Xây dựng prompt cho agent."""
 
     STYLES = [
-        "trang trọng và chuyên nghiệp",
-        "thân thiện và gần gũi",
-        "năng động và hấp dẫn",
+        "Ngắn: Nói qua nhanh, vắn tắt, chỉ các điểm chính",
+        "Bình thường: Nói tin tức, phân tích nhẹ nhàng, dễ hiểu",
+        "Chuyên sâu: Phân tích kỹ càng, nói rõ ảnh hưởng tích cực và tiêu cực",
     ]
 
     @staticmethod
@@ -46,16 +46,37 @@ class NewsScriptPromptBuilder:
         self, target_length: str, style: str, min_words: int, max_words: int
     ) -> str:
         target_words = self._target_word_count(min_words, max_words)
+        
+        # Hướng dẫn cụ thể cho mỗi phong cách
+        style_instruction = ""
+        if "Ngắn" in style:
+            style_instruction = (
+                "Phong cách NGẮN: Nói qua nhanh, vắn tắt, chỉ nêu những điểm chính, sự kiện then chốt. "
+                "Không cần giải thích chi tiết, tập trung vào các thông tin quan trọng nhất."
+            )
+        elif "Chuyên sâu" in style:
+            style_instruction = (
+                "Phong cách CHUYÊN SÂU: Phân tích kỹ càng, nêu rõ ảnh hưởng tích cực và tiêu cực của vấn đề. "
+                "Đi sâu vào nguyên nhân, hệ quả, quan điểm khác nhau và mong đợi phía trước. "
+                "Cần khai thác đầy đủ bối cảnh, ý nghĩa và chiều sâu của sự kiện."
+            )
+        else:  # Bình thường
+            style_instruction = (
+                "Phong cách BÌNH THƯỜNG: Nói tin tức một cách tự nhiên, phân tích nhẹ nhàng, dễ hiểu cho công chúng rộng. "
+                "Kết hợp thông tin cơ bản với phân tích cân bằng, không quá sâu nhưng cũng không thiếu sự liên kết."
+            )
+        
         return f"""Bạn là biên tập viên viết kịch bản tin tức tiếng Việt cho radio/podcast.
 
 Mục tiêu thời lượng: {target_length}.
 Mục tiêu số từ: ưu tiên gần {target_words} từ nhất có thể. Bắt buộc nằm trong {min_words}-{max_words} từ.
 
+{style_instruction}
+
 Quy tắc bắt buộc:
 - Luôn viết bằng tiếng Việt có dấu đầy đủ, tự nhiên và đúng chính tả.
 - Bám sát dữ kiện từ bài nguồn, không thêm chi tiết không có căn cứ.
 - Viết thành kịch bản hoàn chỉnh, mạch lạc, dễ đọc thành lời.
-- Giữ phong cách: {style}.
 - Không dùng markdown đậm, không dùng bullet list trong phần kịch bản.
 - Heading phải ở dạng văn bản thường:
 Mở đầu:
@@ -65,7 +86,7 @@ Kết luận:
 
 Cách triển khai:
 - Mở đầu tạo hook nhanh và đặt bối cảnh.
-- Nội dung chính là phần dài nhất, cần diễn giải đủ sự kiện, nguyên nhân, tác động và ý nghĩa.
+- Nội dung chính là phần dài nhất, cần phù hợp với phong cách đã chọn.
 - Kết luận chốt thông điệp, gọn nhưng không cụt ý.
 """
 
