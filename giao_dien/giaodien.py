@@ -427,13 +427,17 @@ def render_results_tab():
             unsafe_allow_html=True,
         )
 
-        st.text_area(
+        edited_script = st.text_area(
             f"script_{i}",
             value=script,
             height=360,
             key=f"script_display_{i}",
             label_visibility="collapsed",
         )
+        
+        # Cập nhật session state khi người dùng chỉnh sửa
+        if edited_script != st.session_state.scripts[i - 1]:
+            st.session_state.scripts[i - 1] = edited_script
 
         col1, col2, col3, col4 = st.columns(4)
 
