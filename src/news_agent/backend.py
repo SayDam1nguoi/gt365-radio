@@ -253,9 +253,7 @@ class ScriptGeneratorBackend:
 
             full_script = f"{intro}\n\n{main_content}\n\n{outro}"
             final_words = len(full_script.split())
-            self.logger.info(
-                f"Tạo kịch bản dài thành công: {final_words} từ (mục tiêu: {min_words}-{max_words} từ)"
-            )
+            self.logger.info(f"Tạo kịch bản dài thành công: {final_words} từ")
             self._emit_progress(
                 progress_callback,
                 15,
@@ -365,9 +363,7 @@ class ScriptGeneratorBackend:
                 return None
 
             word_count = len(script.split())
-            self.logger.info(
-                f"Tạo kịch bản ngắn thành công: {word_count} từ (mục tiêu: {min_words}-{max_words} từ)"
-            )
+            self.logger.info(f"Tạo kịch bản ngắn thành công: {word_count} từ")
 
             if not self._is_word_count_acceptable(word_count, min_words, max_words):
                 self._emit_progress(
