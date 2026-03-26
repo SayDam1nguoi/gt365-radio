@@ -222,35 +222,29 @@ def render_config_section():
     _render_section_header(
         "⚙️",
         "Cấu hình đầu ra",
-        "Chọn thời lượng và số phiên bản muốn tạo.",
+        "Chọn phong cách kịch bản, thời lượng và số phiên bản muốn tạo.",
         "Config",
     )
 
     col1, col2, col3 = st.columns([2, 1, 1])
 
     with col1:
-        script_length = st.selectbox(
-            "Độ dài kịch bản",
+        script_style = st.selectbox(
+            "Phong cách kịch bản",
             options=[
-                "Ngắn (1–2 phút)",
-                "Trung bình (3–5 phút)",
-                "Dài (5–10 phút)",
-                "Rất dài (10–15 phút)",
-                "Tùy chỉnh",
+                "Ngắn: Nói qua nhanh",
+                "Bình thường: Nói tin tức, phân tích nhẹ nhàng",
+                "Chuyên sâu: Phân tích kỹ càng, ảnh hưởng tích cực & tiêu cực",
             ],
         )
 
     with col2:
-        custom_length = None
-        if script_length == "Tùy chỉnh":
-            custom_length = st.number_input("Số phút", min_value=1, max_value=30, value=5)
-        else:
-            st.markdown("<div style='height:68px'></div>", unsafe_allow_html=True)
+        duration = st.number_input("Thời lượng (phút)", min_value=1, max_value=30, value=5)
 
     with col3:
         num_scripts = st.number_input("Số phiên bản", min_value=1, max_value=3, value=1)
 
-    return script_length, custom_length, num_scripts
+    return script_style, duration, num_scripts
 
 
 def render_ai_section(model_options: dict):

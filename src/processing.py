@@ -38,6 +38,14 @@ class NewsAgentProcessingMixin:
                 return {"success": False, "error": "Thiếu API key cho AI model", "plan": None}
 
             is_multi = len(urls) > 1
+            
+            # Xử lý duration thành target_length format
+            duration = user_input.get("duration", "5 phút")
+            if isinstance(duration, (int, float)):
+                target_length = f"{int(duration)} phút"
+            else:
+                target_length = str(duration)
+            
             plan = {
                 "task_type": "generate_combined_script" if is_multi else "generate_news_script",
                 "steps": (
@@ -49,7 +57,8 @@ class NewsAgentProcessingMixin:
                     "urls": urls,
                     "source": user_input.get("source"),
                     "user_prompt": user_input.get("prompt", ""),
-                    "target_length": user_input.get("length", "3-5 phút"),
+                    "style": user_input.get("style", "Bình thường: Nói tin tức, phân tích nhẹ nhàng"),
+                    "target_length": target_length,
                     "num_scripts": user_input.get("num_scripts", 1),
                 },
                 "estimated_time": self._estimate_processing_time(
@@ -385,16 +394,22 @@ class NewsAgentProcessingMixin:
         self,
         urls: List[str],
         prompt: str = "",
-        length: str = "3-5 phút",
+        style: str = "Bình thường: Nói tin tức, phân tích nhẹ nhàng",
+        duration: str = "5 phút",
         num_scripts: int = 1,
         source: str = None,
     ) -> Tuple[bool, Dict[str, Any]]:
         """Xử lý nhiều URL thành kịch bản tổng hợp."""
+        # Kết hợp style vào prompt
+        style_instruction = self._get_style_instruction(style)
+        combined_prompt = f"{style_instruction}\n\n{prompt}".strip()
+        
         understanding = self.understand_request(
             {
                 "urls": urls,
-                "prompt": prompt,
-                "length": length,
+                "prompt": combined_prompt,
+                "duration": duration,
+                "style": style,
                 "num_scripts": num_scripts,
                 "source": source,
             }
@@ -404,3 +419,12 @@ class NewsAgentProcessingMixin:
 
         results = self.execute_multiple_plan(understanding["plan"])
         return results["success"], results
+
+    def _get_style_instruction(self, style: str) -> str:
+        """Chuyển đổi style selection thành instruction cho AI."""
+        if "Ngắn" in style:
+            return "Phong cách: Tạo kịch bản nói qua nhanh, vắn tắt, chỉ các điểm chính."
+        elif "Chuyên sâu" in style:
+            return "Phong cách: Phân tích kỹ càng, nói rõ ảnh hưởng tích cực và tiêu cực của vấn đề."
+        else:  # Bình thường
+            return "Phong cách: Nói tin tức thông thường, phân tích nhẹ nhàng, dễ hiểu."

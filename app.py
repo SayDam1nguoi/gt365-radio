@@ -104,7 +104,7 @@ def handle_script_creation():
     """Xử lý form tạo kịch bản."""
     news_urls = render_input_section()
     user_prompt = render_prompt_section()
-    script_length, custom_length, num_scripts = render_config_section()
+    script_style, duration, num_scripts = render_config_section()
     selected_label, selected_model, manual_api_key = render_ai_section(MODEL_OPTIONS)
 
     resolved_api_key, api_key_source = resolve_api_key(selected_model, manual_api_key)
@@ -143,10 +143,8 @@ def handle_script_creation():
             )
             return
 
-        final_length = (
-            f"{custom_length} phút" if script_length == "Tùy chỉnh" and custom_length else script_length
-        )
-        process_news_to_script(news_urls, user_prompt, final_length, num_scripts, progress_hosts)
+        final_duration = f"{duration} phút"
+        process_news_to_script(news_urls, user_prompt, script_style, final_duration, num_scripts, progress_hosts)
 
 
 def render_processing_state(progress_hosts, payload):
@@ -178,7 +176,7 @@ def render_processing_state(progress_hosts, payload):
     )
 
 
-def process_news_to_script(urls, prompt, length, num_scripts, progress_hosts):
+def process_news_to_script(urls, prompt, script_style, duration, num_scripts, progress_hosts):
     """Tạo kịch bản từ danh sách URL."""
     agent = st.session_state.agent
 
@@ -204,7 +202,8 @@ def process_news_to_script(urls, prompt, length, num_scripts, progress_hosts):
         success, results = agent.process_multiple_news_to_script(
             urls=urls,
             prompt=prompt,
-            length=length,
+            style=script_style,
+            duration=duration,
             num_scripts=num_scripts,
             source="universal",
         )
