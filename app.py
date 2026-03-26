@@ -128,7 +128,7 @@ def handle_script_creation():
             st.session_state.result_navigation_ready = False
             rerun_app()
 
-    if st.button("Tạo kịch bản chuyên nghiệp", type="primary", use_container_width=True):
+    if st.button("Tạo kịch bản", type="primary", use_container_width=True):
         if not news_urls:
             show_error_message("Vui lòng nhập ít nhất một link bài báo hợp lệ.")
             return

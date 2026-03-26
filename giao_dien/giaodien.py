@@ -232,9 +232,9 @@ def render_config_section():
         script_style = st.selectbox(
             "Phong cách kịch bản",
             options=[
-                "Ngắn: Nói qua nhanh",
-                "Bình thường: Nói tin tức, phân tích nhẹ nhàng",
-                "Chuyên sâu: Phân tích kỹ càng, ảnh hưởng tích cực & tiêu cực",
+                "Ngắn",
+                "Bình thường",
+                "Chuyên sâu",
             ],
         )
 
@@ -417,7 +417,7 @@ def render_results_tab():
                         <div class="result-index">{i:02d}</div>
                         <div class="result-copy">
                             <div class="result-title">Kịch bản {i}</div>
-                            <div class="result-subtitle">Đã tối ưu để biên tập và đọc thu âm.</div>
+                            <div class="result-subtitle">Kịch bản đã sẵn sàng.</div>
                         </div>
                     </div>
                     <div class="result-badge">Phiên bản {i}</div>
