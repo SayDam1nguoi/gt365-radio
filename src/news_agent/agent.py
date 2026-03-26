@@ -223,12 +223,12 @@ Nội dung bài báo:
         }
 
     def create_expand_script_request(
-        self, current_script: str, article: NewsArticle, user_prompt: str, words_needed: int
+        self, current_script: str, article: NewsArticle, user_prompt: str
     ) -> Dict[str, str]:
         return {
             "system_prompt": (
-                f"Mở rộng kịch bản hiện tại thêm khoảng {words_needed} từ. "
-                "Giữ nguyên cấu trúc, không lặp ý, bổ sung bằng phân tích và chuyển ý tự nhiên. "
+                "Mở rộng kịch bản hiện tại bằng phân tích, diễn giải và chuyển ý tự nhiên. "
+                "Giữ nguyên cấu trúc, không lặp ý. "
                 "Bắt buộc dùng tiếng Việt có dấu."
             ),
             "user_prompt": f"""Kịch bản hiện tại:
