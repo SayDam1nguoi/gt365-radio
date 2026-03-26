@@ -467,6 +467,31 @@ def render_results_tab():
                     )
                 except Exception as exc:
                     st.error(f"Lỗi tạo file: {exc}")
+                
+                # Thêm chức năng TTS
+                import os
+                from src.tts import TTSService
+                
+                audio_key = f"audio_path_{i}"
+                if audio_key in st.session_state and os.path.exists(st.session_state[audio_key]):
+                    st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
+                    st.audio(st.session_state[audio_key])
+                else:
+                    st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
+                    if st.button("🗣️ Nói (TTS)", key=f"speak_btn_{i}", use_container_width=True):
+                        with st.spinner("Đang tạo audio..."):
+                            tts = TTSService()
+                            os.makedirs("output_audio", exist_ok=True)
+                            
+                            # Xóa dấu câu, ký tự đặc biệt nếu cần (tuỳ model), nhưng ở đây đẩy nguyên script
+                            out_path = f"output_audio/script_audio_{i}_{datetime.now().strftime('%M%S')}.wav"
+                            success = tts.generate_audio(script, out_path)
+                            
+                            if success:
+                                st.session_state[audio_key] = out_path
+                                _rerun_streamlit()
+                            else:
+                                st.error("Lỗi tạo giọng đọc. Vui lòng xem log Console.")
 
         st.markdown("<div style='height: 1.2rem;'></div>", unsafe_allow_html=True)
 
