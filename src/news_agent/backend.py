@@ -97,7 +97,7 @@ class ScriptGeneratorBackend:
 
     def _calculate_target_words(self, target_length: str) -> tuple[int, int]:
         """Tính khoảng số từ từ thời lượng mục tiêu."""
-        words_per_minute = 160
+        words_per_minute = 130
         numbers = re.findall(r"\d+", target_length)
 
         if len(numbers) == 1:
@@ -164,7 +164,7 @@ class ScriptGeneratorBackend:
             min_words, max_words = self._calculate_target_words(target_length)
             self.logger.info(f"Tạo kịch bản {target_length}: cần {min_words}-{max_words} từ")
 
-            if min_words >= 800:
+            if min_words >= 600:
                 return self._generate_script_with_iterative_expansion(
                     article,
                     user_prompt,

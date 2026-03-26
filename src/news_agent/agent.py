@@ -150,8 +150,9 @@ Nội dung nguồn:
             ),
             "main": (
                 f"Viết riêng phần nội dung chính. Heading phải là '{heading}'. "
-                "Đây là phần dài nhất, phải khai thác đủ dữ kiện, nguyên nhân, tác động, diễn giải và kết nối ý. "
-                f"Phong cách: {style}. Bắt buộc viết bằng tiếng Việt có dấu. Không markdown, không bullet."
+                "Khai thác dữ kiện, nguyên nhân, tác động và kết nối ý. "
+                + (f"BẮT BUỘC viết chi tiết và đầy đủ ({target_words} từ), tuyệt đối không tóm tắt hay kết thúc sớm. " if target_words >= 350 or "Chuyên sâu" in style else f"Bám sát ý chính, trình bày gọn gàng ({target_words} từ), không cần lan man. ")
+                + f"Phong cách: {style}. Bắt buộc viết bằng tiếng Việt có dấu. Không markdown, không bullet."
             ),
             "outro": (
                 f"Viết riêng phần kết luận. Heading phải là '{heading}'. "

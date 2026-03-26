@@ -407,7 +407,7 @@ def render_results_tab():
     for i, script in enumerate(scripts, 1):
         word_count = len(script.split())
         char_count = len(script)
-        estimated_time = word_count / 160
+        estimated_time = word_count / 130
 
         st.markdown(
             f"""
