@@ -176,14 +176,12 @@ Hãy viết phần {section_type} đầy đủ và phải dùng tiếng Việt c
     def create_section_retry_prompt(
         self, section_type: str, target_words: int, actual_words: int, user_content: str
     ) -> str:
-        min_section_words = max(80, int(target_words * 0.9))
-        max_section_words = int(target_words * 1.1)
-        return f"""Phần {section_type} trước đó có {actual_words} từ nên chưa đạt mục tiêu.
-Hãy viết lại gần {target_words} từ nhất có thể, bắt buộc nằm trong {min_section_words}-{max_section_words} từ.
+        return f"""Phần {section_type} trước đó chưa đạt yêu cầu.
+Hãy viết lại đầy đủ và chi tiết hơn.
 
 {user_content}
 
-Tăng độ chi tiết, thêm chuyển ý và diễn giải để đạt đúng độ dài. Bắt buộc giữ tiếng Việt có dấu."""
+Tăng độ chi tiết, thêm chuyển ý và diễn giải để đạt đúng thời lượng. Bắt buộc giữ tiếng Việt có dấu."""
 
     def create_outline_request(
         self, article: NewsArticle, user_prompt: str, target_length: str, min_words: int
@@ -241,13 +239,11 @@ Thông tin bổ sung:
     def create_short_retry_prompt(
         self, user_content: str, word_count: int, min_words: int, max_words: int
     ) -> str:
-        target_words = self._target_word_count(min_words, max_words)
-        return f"""Kịch bản trước chỉ có {word_count} từ nên chưa đạt yêu cầu.
-Hãy viết lại với mục tiêu khoảng {target_words} từ, bắt buộc trong {min_words}-{max_words} từ.
+        return f"""Kịch bản trước chưa đạt yêu cầu. Hãy viết lại đầy đủ và chi tiết hơn.
 
 {user_content}
 
-Thêm diễn giải, tác động và chuyển ý để đạt đúng thời lượng. Bắt buộc dùng tiếng Việt có dấu."""
+Thêm diễn giải và chuyển ý để đạt đúng thời lượng. Bắt buộc dùng tiếng Việt có dấu."""
 
 
 class NewsScriptAgent(NewsAgentProcessingMixin):

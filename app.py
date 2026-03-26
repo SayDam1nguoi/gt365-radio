@@ -128,23 +128,45 @@ def handle_script_creation():
             st.session_state.result_navigation_ready = False
             rerun_app()
 
-    if st.button("Tạo kịch bản", type="primary", use_container_width=True):
+    def on_generate_click():
+        st.session_state.is_generating = True
+
+    is_generating = st.session_state.get("is_generating", False)
+    generate_btn_container = st.empty()
+
+    generate_btn_container.button(
+        "Đang xử lý..." if is_generating else "Tạo kịch bản",
+        type="primary",
+        use_container_width=True,
+        disabled=is_generating,
+        on_click=on_generate_click,
+        key="btn_generate_start"
+    )
+
+    if is_generating:
+        st.session_state.is_generating = False
+
         if not news_urls:
             show_error_message("Vui lòng nhập ít nhất một link bài báo hợp lệ.")
+            generate_btn_container.button("Tạo kịch bản", type="primary", use_container_width=True, on_click=on_generate_click, key="btn_generate_err1")
             return
 
         if not user_prompt.strip():
             show_warning_message("Vui lòng nhập prompt để Agent hiểu rõ yêu cầu của bạn.")
+            generate_btn_container.button("Tạo kịch bản", type="primary", use_container_width=True, on_click=on_generate_click, key="btn_generate_err2")
             return
 
         if not resolved_api_key:
             show_error_message(
                 f"Chưa có API key cho model đã chọn. Vui lòng nhập trực tiếp hoặc cấu hình biến môi trường {api_key_source}."
             )
+            generate_btn_container.button("Tạo kịch bản", type="primary", use_container_width=True, on_click=on_generate_click, key="btn_generate_err3")
             return
 
         final_duration = f"{duration} phút"
         process_news_to_script(news_urls, user_prompt, script_style, final_duration, num_scripts, progress_hosts)
+        
+        generate_btn_container.button("Tạo kịch bản", type="primary", use_container_width=True, on_click=on_generate_click, key="btn_generate_done")
 
 
 def render_processing_state(progress_hosts, payload):
