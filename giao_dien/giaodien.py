@@ -116,6 +116,14 @@ def render_supported_sources():
                     """,
                     unsafe_allow_html=True,
                 )
+        
+        st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
+        st.warning(
+            "⚠️ **Lưu ý chặn truy cập:** Các báo như **Dân Trí, Người Lao Động, CAND, Pháp Luật** "
+            "đôi khi có cơ chế bảo mật (Cookie/Cloudflare) có thể chặn việc lấy tin tự động từ link. "
+            "Với các trang bị chặn, bạn hãy trực tiếp copy toàn bộ chữ của bài báo và dán vào ô 'Yêu cầu' bên dưới "
+            "để bot có thể đọc và tham khảo làm kịch bản nhé!"
+        )
 
 
 def render_input_section():
