@@ -119,10 +119,10 @@ def render_supported_sources():
         
         st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
         st.warning(
-            "⚠️ **Lưu ý chặn truy cập:** Các báo như **Dân Trí, Người Lao Động, CAND, Pháp Luật** "
-            "đôi khi có cơ chế bảo mật (Cookie/Cloudflare) có thể chặn việc lấy tin tự động từ link. "
-            "Với các trang bị chặn, bạn hãy trực tiếp copy toàn bộ chữ của bài báo và dán vào ô 'Yêu cầu' bên dưới "
-            "để bot có thể đọc và tham khảo làm kịch bản nhé!"
+            "⚠️ **Lưu ý:** Các trang báo như **Dân Trí, Người Lao Động, CAND, Pháp Luật** "
+            "đôi khi bị chặn tự động bởi bảo mật (Cookie/Cloudflare). Bạn nên cân nhắc "
+            "ghi chèn link của các nguồn này vào thẳng ô 'Yêu cầu biên tập' bên dưới để bot "
+            "tham khảo thêm thông tin kịch bản."
         )
 
 
