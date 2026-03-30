@@ -28,12 +28,12 @@ def get_custom_css_string():
             --amber:        #d97706;
             --amber-dim:    #fffbeb;
             --amber-border: #fde68a;
-            --shadow-sm:    0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
-            --shadow:       0 4px 16px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
-            --shadow-lg:    0 12px 40px rgba(0,0,0,0.09);
-            --r:            16px;
-            --r-sm:         10px;
-            --r-xs:         7px;
+            --shadow-sm:    0 1px 2px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.05);
+            --shadow:       0 8px 30px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.05);
+            --shadow-lg:    0 15px 45px rgba(0,0,0,0.1);
+            --r:            0px;
+            --r-sm:         0px;
+            --r-xs:         0px;
         }
 
         /* ─── Base ──────────────────────────────────────────── */
@@ -87,7 +87,7 @@ def get_custom_css_string():
             position: relative;
             overflow: hidden;
             padding: 2.8rem 2.8rem 2.4rem;
-            border-radius: 20px;
+            border-radius: 0px;
             background: var(--surface);
             border: 1px solid var(--line);
             box-shadow: var(--shadow);
@@ -99,8 +99,8 @@ def get_custom_css_string():
             position: absolute;
             top: -100px; right: -100px;
             width: 380px; height: 380px;
-            border-radius: 999px;
-            background: radial-gradient(circle, rgba(29,78,216,0.05) 0%, transparent 70%);
+            border-radius: 0px;
+            background: transparent;
             pointer-events: none;
         }
 
@@ -111,7 +111,7 @@ def get_custom_css_string():
             align-items: center;
             gap: 0.45rem;
             padding: 0.32rem 0.75rem;
-            border-radius: 999px;
+            border-radius: 0px;
             border: 1px solid var(--accent-mid);
             background: var(--accent-light);
             font-size: 0.7rem;
@@ -125,7 +125,7 @@ def get_custom_css_string():
         .hero-eyebrow::before {
             content: "";
             width: 5px; height: 5px;
-            border-radius: 999px;
+            border-radius: 0px;
             background: var(--accent);
             animation: pulse-dot 2s ease-in-out infinite;
         }
@@ -259,7 +259,7 @@ def get_custom_css_string():
 
         .pill-note {
             padding: 0.3rem 0.7rem;
-            border-radius: 999px;
+            border-radius: 0px;
             background: var(--surface-2);
             border: 1px solid var(--line-strong);
             font-size: 0.72rem !important;
@@ -411,7 +411,7 @@ def get_custom_css_string():
             padding: 1rem 1.1rem 0.7rem;
             border: 1px solid var(--line);
             border-bottom: 0;
-            border-radius: var(--r) var(--r) 0 0;
+            border-radius: 0px;
             background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(239,244,255,0.92));
             box-shadow: var(--shadow-sm);
         }
@@ -438,7 +438,7 @@ def get_custom_css_string():
             margin-bottom: 1.25rem;
             border: 1px solid var(--line);
             border-top: 0;
-            border-radius: 0 0 var(--r) var(--r);
+            border-radius: 0px;
             background: var(--surface);
             box-shadow: var(--shadow-sm);
         }
@@ -447,7 +447,7 @@ def get_custom_css_string():
             margin: 0 !important;
             padding: 0.68rem 1rem !important;
             border: 1px solid var(--line) !important;
-            border-radius: 999px !important;
+            border-radius: 0px !important;
             background: var(--surface-2) !important;
             transition: all 0.18s ease;
         }
@@ -620,7 +620,7 @@ def get_custom_css_string():
         .result-badge {
             display: inline-flex;
             align-items: center;
-            border-radius: 999px;
+            border-radius: 0px;
             padding: 0.3rem 0.75rem;
             background: var(--green-dim);
             color: var(--green) !important;
@@ -728,7 +728,7 @@ def get_custom_css_string():
         .progress-percent {
             min-width: 68px;
             padding: 0.34rem 0.7rem;
-            border-radius: 999px;
+            border-radius: 0px;
             background: var(--accent-light);
             border: 1px solid var(--accent-mid);
             font-size: 0.92rem;
@@ -779,7 +779,7 @@ def get_custom_css_string():
         /* ─── Scrollbar ─────────────────────────────────────── */
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 0px; }
 
         /* ─── Animations ────────────────────────────────────── */
         .fade-in { animation: fadein 0.35s ease both; }
@@ -809,5 +809,10 @@ def get_custom_css_string():
             .hero-title { font-size: 1.9rem; }
             .hero-grid, .soft-grid { grid-template-columns: 1fr; }
             .result-head, .section-head { flex-direction: column; align-items: flex-start; }
+        }
+
+        /* ─── Ultra Sharp Global Override ───────────────────── */
+        * {
+            border-radius: 0px !important;
         }
     """
