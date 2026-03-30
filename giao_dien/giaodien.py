@@ -5,11 +5,28 @@ Các hàm điều hướng và xử lý logic kết nối UI cho GT365 Radio New
 import os
 import hashlib
 from datetime import datetime
+import time
 import streamlit as st
 from src.tts import TTSService
 
 # Export tất cả các thành phần UI để app.py có thể lấy qua giaodien.py (do app.py đang import *)
 from .ui import *
+
+
+def cleanup_old_audio_files(dir_path: str, max_age_hours: int = 24):
+    """Xóa các file audio cũ trong thư mục để tránh tràn ổ cứng (Bug Fix BE/FE)."""
+    if not os.path.exists(dir_path):
+        return
+    now = time.time()
+    for filename in os.listdir(dir_path):
+        file_path = os.path.join(dir_path, filename)
+        if os.path.isfile(file_path):
+            # Nếu file cũ hơn max_age_hours, xóa đi
+            if os.stat(file_path).st_mtime < now - (max_age_hours * 3600):
+                try:
+                    os.remove(file_path)
+                except Exception:
+                    pass
 
 
 def _rerun_streamlit():
@@ -259,8 +276,8 @@ def render_results_tab():
                         with st.spinner("Đang tạo audio..."):
                             tts = TTSService()
                             os.makedirs("output_audio", exist_ok=True)
+                            cleanup_old_audio_files("output_audio", max_age_hours=2)
                             
-                            # Xóa dấu câu, ký tự đặc biệt nếu cần (tuỳ model), nhưng ở đây đẩy nguyên script
                             out_path = f"output_audio/script_audio_{i}_{datetime.now().strftime('%M%S')}.wav"
                             success = tts.generate_audio(script, out_path)
                             

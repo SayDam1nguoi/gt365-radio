@@ -69,7 +69,6 @@ class NewsScriptPromptBuilder:
         return f"""Bạn là biên tập viên viết kịch bản tin tức tiếng Việt cho radio/podcast.
 
 Mục tiêu thời lượng: {target_length}.
-Mục tiêu số từ: ưu tiên gần {target_words} từ nhất có thể. Bắt buộc nằm trong {min_words}-{max_words} từ.
 
 {style_instruction}
 
@@ -107,9 +106,8 @@ Cách triển khai:
         return f"""Yêu cầu của người dùng:
 {instruction}
 
-Mục tiêu thời lượng: {target_length}
-Mục tiêu số từ: khoảng {target_words} từ, bắt buộc trong {min_words}-{max_words} từ.
-Ưu tiên tuân thủ số từ và thời lượng. Không viết quá ngắn.
+Mục tiêu thời lượng: {target_length}. Ưu tiên thỏa mãn yếu tố này.
+Không viết quá ngắn, cần cung cấp đủ thông tin sâu.
 
 Đối tượng người nghe:
 - Độ tuổi: 25-60
