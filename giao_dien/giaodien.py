@@ -478,15 +478,19 @@ def render_results_tab():
                 
                 # Thêm chức năng TTS
                 import os
+                import hashlib
                 from src.tts import TTSService
                 
-                audio_key = f"audio_path_{i}"
+                # Băm nội dung kịch bản để tạo key duy nhất, tránh dùng lại audio cũ cho kịch bản mới
+                script_hash = hashlib.md5(script.encode('utf-8')).hexdigest()
+                audio_key = f"audio_path_{i}_{script_hash}"
+                
                 if audio_key in st.session_state and os.path.exists(st.session_state[audio_key]):
                     st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
                     st.audio(st.session_state[audio_key])
                 else:
                     st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
-                    if st.button("🗣️ Nói (TTS)", key=f"speak_btn_{i}", use_container_width=True):
+                    if st.button("🗣️ Nói (TTS)", key=f"speak_btn_{i}_{script_hash[:8]}", use_container_width=True):
                         with st.spinner("Đang tạo audio..."):
                             tts = TTSService()
                             os.makedirs("output_audio", exist_ok=True)
