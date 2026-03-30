@@ -28,24 +28,36 @@ def render_header():
     st.markdown(
         """
         <div class="hero-shell fade-in">
-            <div class="hero-eyebrow">GT365 Radio Workspace</div>
-            <h1 class="hero-title">Biến bài báo thành<br><em>kịch bản phát thanh</em></h1>
-            <p class="hero-copy">
-                Dán link bài báo, mô tả phong cách bạn muốn và nhận kịch bản sẵn sàng cho radio,
-                podcast hoặc bản tin video trong vài chục giây.
-            </p>
-            <div class="hero-grid">
-                <div class="hero-stat">
-                    <span>Đầu vào</span>
-                    <strong>11+ trang báo Việt Nam</strong>
+            <div class="hero-inner">
+                <div class="hero-content">
+                    <div class="hero-eyebrow">GT365 Radio Workspace · Version 2.0</div>
+                    <div class="hero-title">Biến bài báo thành<br><em>kịch bản phát thanh</em></div>
+                    <p class="hero-copy">
+                        Dán tự do link bài báo, cấu hình phong cách mong muốn và nhận ngay kịch bản được phân tích chuẩn xác,
+                        tối ưu hoàn toàn cho giọng đọc radio, podcast hoặc bản tin video chuyên nghiệp.
+                    </p>
+                    <div class="hero-badges">
+                        <span class="h-badge">⚡ Tốc độ xử lý đa luồng</span>
+                        <span class="h-badge">🎯 Tối ưu văn phong đọc</span>
+                        <span class="h-badge">🎙️ Sẵn sàng bóc băng TTS</span>
+                    </div>
                 </div>
-                <div class="hero-stat">
-                    <span>Đầu ra</span>
-                    <strong>Kịch bản có cấu trúc rõ ràng</strong>
-                </div>
-                <div class="hero-stat">
-                    <span>Tối ưu cho</span>
-                    <strong>Biên tập và thu âm</strong>
+                <div class="hero-stats-panel">
+                    <div class="hero-stat">
+                        <span>Đầu vào</span>
+                        <strong>11+ trang báo Việt Nam</strong>
+                        <div class="stat-bar"></div>
+                    </div>
+                    <div class="hero-stat">
+                        <span>Đầu ra</span>
+                        <strong>Cấu trúc tin tức rành mạch</strong>
+                        <div class="stat-bar"></div>
+                    </div>
+                    <div class="hero-stat">
+                        <span>Lưu trữ</span>
+                        <strong>Hỗ trợ tải Audio & Word</strong>
+                        <div class="stat-bar"></div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -85,117 +85,133 @@ def get_custom_css_string():
         /* ─── Hero ──────────────────────────────────────────── */
         .hero-shell {
             position: relative;
-            overflow: hidden;
-            padding: 2.8rem 2.8rem 2.4rem;
+            background: #09090b;
+            border: 1px solid #27272a;
             border-radius: 0px;
-            background: var(--surface);
-            border: 1px solid var(--line);
-            box-shadow: var(--shadow);
-            margin-bottom: 0.5rem;
+            margin-bottom: 2rem;
+            color: #ffffff;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
         }
 
-        .hero-shell::after {
+        .hero-shell::before {
             content: "";
             position: absolute;
-            top: -100px; right: -100px;
-            width: 380px; height: 380px;
-            border-radius: 0px;
-            background: transparent;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: linear-gradient(#18181b 1px, transparent 1px), linear-gradient(90deg, #18181b 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.5;
             pointer-events: none;
         }
 
-        .hero-eyebrow {
+        .hero-inner {
+            display: flex;
+            flex-direction: column;
             position: relative;
-            z-index: 1;
+            z-index: 2;
+        }
+
+        .hero-content {
+            padding: 3rem 3rem 2.5rem;
+        }
+
+        .hero-eyebrow {
             display: inline-flex;
             align-items: center;
-            gap: 0.45rem;
-            padding: 0.32rem 0.75rem;
-            border-radius: 0px;
-            border: 1px solid var(--accent-mid);
-            background: var(--accent-light);
-            font-size: 0.7rem;
+            padding: 0.35rem 0.8rem;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            font-size: 0.65rem;
             font-weight: 700;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: var(--accent) !important;
-            margin-bottom: 1.1rem;
-        }
-
-        .hero-eyebrow::before {
-            content: "";
-            width: 5px; height: 5px;
-            border-radius: 0px;
-            background: var(--accent);
-            animation: pulse-dot 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50%       { opacity: 0.4; transform: scale(0.65); }
+            color: #a1a1aa;
+            margin-bottom: 1.2rem;
         }
 
         .hero-title {
-            position: relative;
-            z-index: 1;
-            margin: 0 0 0.8rem;
-            font-family: 'Lora', serif !important;
-            font-size: 2.6rem;
-            line-height: 1.12;
+            margin: 0 0 1rem;
+            font-family: 'Lora', serif;
+            font-size: 2.8rem;
+            line-height: 1.15;
             font-weight: 600;
-            letter-spacing: -0.025em;
-            color: var(--text) !important;
+            letter-spacing: -0.02em;
+            color: #f8fafc;
         }
 
         .hero-title em {
             font-style: italic;
-            font-weight: 500;
-            color: var(--accent) !important;
+            color: #60a5fa;
         }
 
         .hero-copy {
-            position: relative;
-            z-index: 1;
-            max-width: 640px;
-            margin: 0 0 2rem;
-            font-size: 0.95rem !important;
-            color: var(--text-2) !important;
-            line-height: 1.75 !important;
-            font-weight: 400;
+            max-width: 680px;
+            margin: 0 0 1.8rem;
+            font-size: 1rem;
+            color: #94a3b8;
+            line-height: 1.7;
         }
 
-        .hero-grid {
-            position: relative;
-            z-index: 1;
+        .hero-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .h-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            border: 1px solid #334155;
+            padding: 0.4rem 0.9rem;
+            background: rgba(15,23,42,0.6);
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .hero-stats-panel {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1px;
-            border: 1px solid var(--line);
-            border-radius: var(--r-sm);
-            overflow: hidden;
+            border-top: 1px solid #27272a;
+            background: rgba(0,0,0,0.2);
         }
 
         .hero-stat {
-            padding: 1rem 1.25rem;
-            background: var(--surface-2);
-            transition: background 0.15s;
+            position: relative;
+            padding: 1.5rem 2rem;
+            border-right: 1px solid #27272a;
         }
-        .hero-stat:hover { background: var(--surface-3); }
+        .hero-stat:last-child {
+            border-right: none;
+        }
 
         .hero-stat span {
             display: block;
-            font-size: 0.72rem !important;
-            font-weight: 600;
-            letter-spacing: 0.07em;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
-            color: var(--text-3) !important;
-            margin-bottom: 0.3rem;
+            color: #94a3b8;
+            margin-bottom: 0.4rem;
         }
 
         .hero-stat strong {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--text) !important;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #f8fafc;
+        }
+
+        .stat-bar {
+            position: absolute;
+            bottom: 0; left: 0;
+            height: 2px;
+            width: 0%;
+            background: #3b82f6;
+            transition: width 0.5s ease;
+        }
+
+        .hero-stat:hover .stat-bar {
+            width: 100%;
         }
 
         /* ─── Section Header ────────────────────────────────── */
