@@ -81,7 +81,7 @@ Quy tắc bắt buộc:
 Mở đầu:
 Nội dung chính:
 Kết luận:
-- Ưu tiên đúng mục tiêu số từ hơn việc viết ngắn cho xong.
+- Ưu tiên TUYỆT ĐỐI việc mở rộng ý tưởng, phân tích sâu và cung cấp nhiều bối cảnh nhất có thể để đạt được THỜI LƯỢNG phát sóng yêu cầu. Không bao giờ được phép viết ngắn dở dang hay tóm tắt hời hợt.
 
 Cách triển khai:
 - Mở đầu và đặt bối cảnh.
@@ -147,19 +147,15 @@ Nội dung nguồn:
                 "Bắt buộc viết bằng tiếng Việt có dấu. Không markdown, không bullet."
             ),
             "main": (
-                f"Viết riêng phần nội dung chính. Heading phải là '{heading}'. "
-                + (
-                    f"⛔ LỆNH BẮT BUỘC TỪ HỆ THỐNG: Bạn phải viết cực kỳ dài và chi tiết (khoảng {int(target_words * 1.2)} từ trở lên) để đạt đủ thời lượng phút yêu cầu. "
-                    "Tuyệt đối không được viết ngắn hay tóm tắt. ĐỂ KÉO DÀI THỜI LƯỢNG MỘT CÁCH TỰ NHIÊN, HÃY: "
-                    "1. Phân tích bối cảnh/nguyên nhân sâu xa của sự việc. "
-                    "2. Phân tích chi tiết góc nhìn của từng bên liên quan. "
-                    "3. Dự báo tác động ngắn hạn và dài hạn lên kinh tế/xã hội hoặc người dân. "
-                    "4. Lấy các ví dụ tương tự hoặc so sánh để làm rõ luận điểm. "
-                    "Nếu bài báo gốc quá ngắn, bắt buộc phải dùng tư duy suy luận để mở rộng và phát triển ý như một chuyên gia bình luận thực thụ. " 
-                    if target_words >= 350 or "Chuyên sâu" in style 
-                    else f"Bám sát ý chính, trình bày gọn gàng ({target_words} từ), không cần lan man. "
-                )
-                + f"Phong cách: {style}. Bắt buộc dùng tiếng Việt có dấu duyệt. Không dùng markdown, không gạch đầu dòng."
+                f"Viết riêng phần nội dung chính. Heading phải là '{heading}'.\n"
+                "⛔ LỆNH BẮT BUỘC KHẮC NGHIỆT TỪ HỆ THỐNG: Kịch bản này ĐÒI HỎI THỜI LƯỢNG RẤT DÀI để phát sóng.\n"
+                "Tuyệt đối KHÔNG ĐƯỢC lược bỏ ý hay tóm tắt ngắn gọn. TUYỆT ĐỐI KHÔNG VIẾT NGẮN. Bạn PHẢI MỞ RỘNG VÀ KÉO DÀI VĂN BẢN tự nhiên qua các thủ pháp:\n"
+                "1. Phân tích chi tiết bối cảnh, lịch sử, hoặc nguyên nhân sâu xa của sự việc.\n"
+                "2. Mô tả cặn kẽ từng góc nhìn, logic và phản ứng của TẤT CẢ các bên liên quan.\n"
+                "3. Suy luận chuyên sâu về tác động ngắn hạn, dài hạn của hệ quả lên kinh tế, xã hội.\n"
+                "4. Lấy tối đa ví dụ mở rộng, so sánh và liên hệ thực tiễn để làm rõ luận điểm.\n"
+                "Nếu bài báo gốc ngắn, bạn PHẢI tự dùng tư duy của một chuyên gia bình luận bồi đắp thêm kiến thức thực tế xung quanh chủ đề đó.\n"
+                f"Phong cách: {style}. Bắt buộc dùng tiếng Việt có dấu. Không dùng markdown, không gạch đầu dòng."
             ),
             "outro": (
                 f"Viết riêng phần kết luận. Heading phải là '{heading}'. "
