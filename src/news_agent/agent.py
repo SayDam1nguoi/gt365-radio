@@ -150,9 +150,18 @@ Nội dung nguồn:
             ),
             "main": (
                 f"Viết riêng phần nội dung chính. Heading phải là '{heading}'. "
-                "Khai thác dữ kiện, nguyên nhân, tác động và kết nối ý. "
-                + (f"BẮT BUỘC viết chi tiết và đầy đủ ({target_words} từ), tuyệt đối không tóm tắt hay kết thúc sớm. " if target_words >= 350 or "Chuyên sâu" in style else f"Bám sát ý chính, trình bày gọn gàng ({target_words} từ), không cần lan man. ")
-                + f"Phong cách: {style}. Bắt buộc viết bằng tiếng Việt có dấu. Không markdown, không bullet."
+                + (
+                    f"⛔ LỆNH BẮT BUỘC TỪ HỆ THỐNG: Bạn phải viết cực kỳ dài và chi tiết (khoảng {int(target_words * 1.2)} từ trở lên) để đạt đủ thời lượng phút yêu cầu. "
+                    "Tuyệt đối không được viết ngắn hay tóm tắt. ĐỂ KÉO DÀI THỜI LƯỢNG MỘT CÁCH TỰ NHIÊN, HÃY: "
+                    "1. Phân tích bối cảnh/nguyên nhân sâu xa của sự việc. "
+                    "2. Phân tích chi tiết góc nhìn của từng bên liên quan. "
+                    "3. Dự báo tác động ngắn hạn và dài hạn lên kinh tế/xã hội hoặc người dân. "
+                    "4. Lấy các ví dụ tương tự hoặc so sánh để làm rõ luận điểm. "
+                    "Nếu bài báo gốc quá ngắn, bắt buộc phải dùng tư duy suy luận để mở rộng và phát triển ý như một chuyên gia bình luận thực thụ. " 
+                    if target_words >= 350 or "Chuyên sâu" in style 
+                    else f"Bám sát ý chính, trình bày gọn gàng ({target_words} từ), không cần lan man. "
+                )
+                + f"Phong cách: {style}. Bắt buộc dùng tiếng Việt có dấu duyệt. Không dùng markdown, không gạch đầu dòng."
             ),
             "outro": (
                 f"Viết riêng phần kết luận. Heading phải là '{heading}'. "
