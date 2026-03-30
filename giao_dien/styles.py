@@ -85,22 +85,22 @@ def get_custom_css_string():
         /* ─── Hero ──────────────────────────────────────────── */
         .hero-shell {
             position: relative;
-            background: #09090b;
-            border: 1px solid #27272a;
+            background: #ffffff;
+            border: 1px solid var(--line);
             border-radius: 0px;
             margin-bottom: 2rem;
-            color: #ffffff;
+            color: var(--text);
             overflow: hidden;
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
+            box-shadow: var(--shadow);
         }
 
         .hero-shell::before {
             content: "";
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-image: linear-gradient(#18181b 1px, transparent 1px), linear-gradient(90deg, #18181b 1px, transparent 1px);
+            background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
             background-size: 20px 20px;
-            opacity: 0.5;
+            opacity: 0.4;
             pointer-events: none;
         }
 
@@ -113,19 +113,20 @@ def get_custom_css_string():
 
         .hero-content {
             padding: 3rem 3rem 2.5rem;
+            background: rgba(255, 255, 255, 0.65);
         }
 
         .hero-eyebrow {
             display: inline-flex;
             align-items: center;
             padding: 0.35rem 0.8rem;
-            border: 1px solid rgba(255,255,255,0.15);
-            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--accent-mid);
+            background: var(--accent-light);
             font-size: 0.65rem;
             font-weight: 700;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: #a1a1aa;
+            color: var(--accent);
             margin-bottom: 1.2rem;
         }
 
@@ -136,19 +137,19 @@ def get_custom_css_string():
             line-height: 1.15;
             font-weight: 600;
             letter-spacing: -0.02em;
-            color: #f8fafc;
+            color: var(--text);
         }
 
         .hero-title em {
             font-style: italic;
-            color: #60a5fa;
+            color: var(--accent);
         }
 
         .hero-copy {
             max-width: 680px;
             margin: 0 0 1.8rem;
             font-size: 1rem;
-            color: #94a3b8;
+            color: var(--text-2);
             line-height: 1.7;
         }
 
@@ -161,10 +162,10 @@ def get_custom_css_string():
         .h-badge {
             font-size: 0.75rem;
             font-weight: 600;
-            color: #e2e8f0;
-            border: 1px solid #334155;
+            color: var(--text-2);
+            border: 1px solid var(--line-strong);
             padding: 0.4rem 0.9rem;
-            background: rgba(15,23,42,0.6);
+            background: var(--surface-2);
             display: inline-flex;
             align-items: center;
         }
@@ -172,14 +173,14 @@ def get_custom_css_string():
         .hero-stats-panel {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            border-top: 1px solid #27272a;
-            background: rgba(0,0,0,0.2);
+            border-top: 1px solid var(--line);
+            background: var(--surface-2);
         }
 
         .hero-stat {
             position: relative;
             padding: 1.5rem 2rem;
-            border-right: 1px solid #27272a;
+            border-right: 1px solid var(--line);
         }
         .hero-stat:last-child {
             border-right: none;
@@ -191,14 +192,14 @@ def get_custom_css_string():
             font-weight: 700;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            color: #94a3b8;
+            color: var(--text-3);
             margin-bottom: 0.4rem;
         }
 
         .hero-stat strong {
             font-size: 0.95rem;
             font-weight: 600;
-            color: #f8fafc;
+            color: var(--text);
         }
 
         .stat-bar {
@@ -206,7 +207,7 @@ def get_custom_css_string():
             bottom: 0; left: 0;
             height: 2px;
             width: 0%;
-            background: #3b82f6;
+            background: var(--accent);
             transition: width 0.5s ease;
         }
 
